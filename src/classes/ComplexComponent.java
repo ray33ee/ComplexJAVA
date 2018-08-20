@@ -20,7 +20,12 @@ public class ComplexComponent extends JComponent {
     private Complex2 _min;
     private Complex2 _max;
     
-    
+    public ComplexComponent(Complex2 min, Complex2 max)
+    {
+        super();
+        _min = min;
+        _max = max;
+    }
     
     /**
      * Gets the width of the image, in pixels
@@ -70,16 +75,21 @@ public class ComplexComponent extends JComponent {
        int w = getWidth();
        int h = getHeight();
        
-        BufferedImage bufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        BufferedImage bufferedImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         int[] imagePixelData = ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
       
-        Complex2 c = new Complex2(0.0f, -1.0f);      
-      
-        for (int i = 0; i < w*h; ++i)
+        Complex2 z;        
+        
+        for (int j = 0; j < getHeight(); ++j)
         {
-            imagePixelData[i] = c.color().getRGB();
+            for (int i = 0; i < getWidth(); ++i)
+            {
+                int index = j * getWidth() + i;
+                z = new Complex2(_min.getReal() + (_max.getReal() - _min.getReal()) * i / getWidth(),
+                                 _min.getImaginary()+ (_max.getImaginary() - _min.getImaginary()) * j / getHeight());
+                imagePixelData[index] = z.color().getRGB();
+            }
         }
-      
       
         return bufferedImage;
    }
