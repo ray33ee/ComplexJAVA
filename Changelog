@@ -1,0 +1,7 @@
+Version 1.0.1
+    - ComplexPanel added (which inherits JPanel) this class will be responsible for drawing.
+    - ComplexPanel not inherited into main class, but instantiated in main instead
+    - Doc comments added to Complex2 and ComplexComponent.
+
+Version 1.0.0
+    - First Commit

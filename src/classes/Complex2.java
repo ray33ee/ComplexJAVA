@@ -24,6 +24,10 @@ public class Complex2 extends Complex {
         super(re);
     }
     
+    /**
+     * Gets the colour of the complex number, as per the domain colouring method
+     * @return the colour of the complex number
+     */
     public Color color()
     {
         float arg = (float)getArgument();
@@ -47,12 +51,7 @@ public class Complex2 extends Complex {
 
             //h = h % 360.0f;
 
-            float q = 0;
-
-            if (l < 0.5)
-                    q = l * (1 + s);
-            else
-                    q = (l + s) - (s * l);
+            float q = l < 0.5 ? l*2 : 1;
 
             float p = 2 * l - q;
 
