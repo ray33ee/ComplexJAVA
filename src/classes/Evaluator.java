@@ -37,13 +37,20 @@ public class Evaluator {
      */
     public void setString(String formula)
     {
-        _tokenlist = new Token[3];
+        _tokenlist = new Token[7];
         
         _tokenlist[0] = new Token(new Complex(0,0), Token.INSTRUCTION.VARIABLE);
         _tokenlist[1] = new Token(new Complex(2,0), Token.INSTRUCTION.CONSTANT);
         _tokenlist[2] = new Token(new Complex(4,0), Token.INSTRUCTION.OPERATOR);
         
-        _stackmax = 2;
+        _tokenlist[3] = new Token(new Complex(0,0), Token.INSTRUCTION.VARIABLE);
+        _tokenlist[4] = new Token(new Complex(2,0), Token.INSTRUCTION.CONSTANT);
+        _tokenlist[5] = new Token(new Complex(2,0), Token.INSTRUCTION.OPERATOR);
+        
+        _tokenlist[6] = new Token(new Complex(0,0), Token.INSTRUCTION.OPERATOR);
+        
+        
+        _stackmax = 5;
     }
     
     /**
@@ -75,22 +82,28 @@ public class Evaluator {
                     switch ((int)_tokenlist[i].getData().getReal())
                     {
                         case 0:
-                            
+                            --pointer;
+                            stack[pointer-1] = stack[pointer-1].add(stack[pointer]);
                             break;
                         case 1:
-                            
+                            --pointer;
+                            stack[pointer-1] = stack[pointer-1].subtract(stack[pointer]);
                             break;
                         case 2:
-                            
+                            --pointer;
+                            stack[pointer-1] = stack[pointer-1].multiply(stack[pointer]);
                             break;
                         case 3:
-                            
+                            --pointer;
+                            stack[pointer-1] = stack[pointer-1].divide(stack[pointer]);
                             break;
                         case 4:
-                            
+                            --pointer;
+                            stack[pointer-1] = stack[pointer-1].pow(stack[pointer]);
                             break;
                         case 5:
-                            
+                            --pointer;
+                            stack[pointer-1] = stack[pointer-1].log().divide(stack[pointer].log());
                             break;
                         case 6:
                             
@@ -159,7 +172,7 @@ public class Evaluator {
             }
         }
         
-        return stack[pointer];
+        return stack[pointer-1];
     }
     
 }
