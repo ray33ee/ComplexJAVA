@@ -1,3 +1,8 @@
+Version 1.0.5
+    - Renamed 'classes' folder to 'complex'
+    - Renamed 'Complex2' to 'ComplexColor'
+    - Basic concurrency implemented
+
 Version 1.0.4
     - Evaluator object implemented (without string conversion)
 

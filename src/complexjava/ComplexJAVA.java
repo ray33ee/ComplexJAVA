@@ -11,7 +11,9 @@
 package complexjava;
 
 import javax.swing.JFrame;
-import classes.ComplexComponent;
+import complex.ComplexComponent;
+import complex.Concurrent;
+import complex.Evaluator;
 import org.apache.commons.math3.complex.Complex;
 
 /**
@@ -20,12 +22,11 @@ import org.apache.commons.math3.complex.Complex;
  */
 public class ComplexJAVA  {
 
-   
    /**
      * @param args the command line arguments
      */
    public static void main(String[] args) {
-        ComplexComponent pan = new ComplexComponent(new Complex(-2,-2), new Complex(2,2));
+        ComplexComponent pan = new ComplexComponent(new Complex(-4,-4), new Complex(4,4));
         JFrame frame = new JFrame();
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -33,6 +34,26 @@ public class ComplexJAVA  {
         frame.setVisible(true);
         
         frame.getContentPane().add(pan);
+        
+        /*Evaluator _evaltor = new Evaluator();
+        
+        int[] data = new int[1800*1000];
+        Concurrent c = new Concurrent(_evaltor, 0, 1800, 1000, new Complex(-4,-4), new Complex(4,4), data);
+        
+        c.start();
+        
+        try 
+        {
+            c.join();
+        } 
+        catch ( InterruptedException e) 
+        {
+           System.out.println("Interrupted");
+        }
+        
+        data = c.getData();
+        
+        System.out.println("complex.ComplexComponent.drawImage() " + data[0]);*/
       
    }
     
