@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package classes;
+package complex;
 
 import org.apache.commons.math3.complex.Complex;
 
@@ -37,7 +37,7 @@ public class Evaluator {
      */
     public void setString(String formula)
     {
-        _tokenlist = new Token[7];
+        _tokenlist = new Token[8];
         
         _tokenlist[0] = new Token(new Complex(0,0), Token.INSTRUCTION.VARIABLE);
         _tokenlist[1] = new Token(new Complex(2,0), Token.INSTRUCTION.CONSTANT);
@@ -48,6 +48,8 @@ public class Evaluator {
         _tokenlist[5] = new Token(new Complex(2,0), Token.INSTRUCTION.OPERATOR);
         
         _tokenlist[6] = new Token(new Complex(0,0), Token.INSTRUCTION.OPERATOR);
+        
+        _tokenlist[7] = new Token(new Complex(8,0), Token.INSTRUCTION.OPERATOR);
         
         
         _stackmax = 5;
@@ -66,9 +68,6 @@ public class Evaluator {
         
         Complex[] stack = new Complex[_stackmax];
         int pointer = 0; //Pointer to top of stack
-        
-        //for (int i = 0; i < stack.length; ++i)
-        //    stack[i] = new Complex(0,0);
         
         for (int i = 0; i < _tokenlist.length; ++i)
         {
@@ -106,37 +105,37 @@ public class Evaluator {
                             stack[pointer-1] = stack[pointer-1].log().divide(stack[pointer].log());
                             break;
                         case 6:
-                            
+                            stack[pointer-1] = stack[pointer-1].negate();
                             break;
                         case 7:
-                            
+                            stack[pointer-1] = stack[pointer-1].conjugate();
                             break;
                         case 8:
-                            
+                            stack[pointer-1] = stack[pointer-1].sqrt();
                             break;
                         case 9:
-                            
+                            stack[pointer-1] = stack[pointer-1].log();
                             break;
                         case 10:
-                            
+                            stack[pointer-1] = stack[pointer-1].exp();
                             break;
                         case 11:
-                            
+                            stack[pointer-1] = stack[pointer-1].sinh();
                             break;
                         case 12:
-                            
+                            stack[pointer-1] = stack[pointer-1].cosh();
                             break;
                         case 13:
-                            
+                            stack[pointer-1] = stack[pointer-1].tanh();
                             break;
                         case 14:
-                            
+                            stack[pointer-1] = stack[pointer-1].sin();
                             break;
                         case 15:
-                            
+                            stack[pointer-1] = stack[pointer-1].cos();
                             break;
                         case 16:
-                            
+                            stack[pointer-1] = stack[pointer-1].tan();
                             break;
                         case 17:
                             
@@ -148,19 +147,19 @@ public class Evaluator {
                             
                             break;
                         case 20:
-                            
+                            stack[pointer-1] = stack[pointer-1].asin();
                             break;
                         case 21:
-                            
+                            stack[pointer-1] = stack[pointer-1].acos();
                             break;
                         case 22:
-                            
+                            stack[pointer-1] = stack[pointer-1].atan();
                             break;
                         case 23:
-                            
+                            stack[pointer-1] = new Complex(stack[pointer-1].abs());
                             break;
                         case 24:
-                            
+                            stack[pointer-1] = new Complex(stack[pointer-1].getArgument());
                             break;
                         
                     }
