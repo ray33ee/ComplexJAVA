@@ -9,28 +9,23 @@ import org.apache.commons.math3.complex.Complex;
 import java.awt.Color;
 
 /**
+ * 
+ * Complex2 class exposes a single public static function, color. This function
+ * takes a complex number and converts it into a colour using domain colouring.
  *
  * @author Will
  */
-public class Complex2 extends Complex {
+public class Complex2 {
     
-    public Complex2(double re, double im)
-    {
-        super(re, im);
-    }
-    
-    public Complex2(double re)
-    {
-        super(re);
-    }
-    
+       
     /**
      * Gets the colour of the complex number, as per the domain colouring method
-     * @return the colour of the complex number
+     * @param z the complex number, z
+     * @return  the colour of the complex number, z
      */
-    public Color color()
+    public static Color color(Complex z)
     {
-        float arg = (float)getArgument();
+        float arg = (float)z.getArgument();
         float hue = arg;
         
         //Convert argument from -pi to pi --> 0 to 2pi

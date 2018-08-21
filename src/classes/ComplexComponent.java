@@ -11,20 +11,29 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import javax.swing.JComponent;
 
+import org.apache.commons.math3.complex.Complex;
+
 /**
  *
  * @author Will
  */
 public class ComplexComponent extends JComponent {
     
-    private Complex2 _min;
-    private Complex2 _max;
+    private Evaluator   _evaltor;
+    private Complex     _min;
+    private Complex     _max;
     
-    public ComplexComponent(Complex2 min, Complex2 max)
+    /**
+     * Construct Complex component and initialise JComponent and member variables.
+     * @param min   the lower left position of the domain
+     * @param max   the upper right position of the domain
+     */
+    public ComplexComponent(Complex min, Complex max)
     {
         super();
         _min = min;
         _max = max;
+        _evaltor = new Evaluator();
     }
     
     /**
@@ -51,7 +60,7 @@ public class ComplexComponent extends JComponent {
      * Gets the minimum domain of the complex landscape (lower left coordinate)
      * @return the lower left position of the domain
      */
-    public Complex2 getMin()
+    public Complex getMin()
     {
         return _min;
     }
@@ -60,7 +69,7 @@ public class ComplexComponent extends JComponent {
      * Gets the maximum domain of the complex landscape (upper right coordinate)
      * @return the upper right position of the domain
      */
-    public Complex2 getMax()
+    public Complex getMax()
     {
         return _max;
     }
@@ -70,7 +79,11 @@ public class ComplexComponent extends JComponent {
         g.drawImage(img, 10, 10,this);
     }
 
-   private Image drawImage(){
+    /**
+     * Construct an image of the landscape. 
+     * @return the image of the landscape
+     */
+    private Image drawImage(){
        
        int w = getWidth();
        int h = getHeight();
@@ -78,16 +91,19 @@ public class ComplexComponent extends JComponent {
         BufferedImage bufferedImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         int[] imagePixelData = ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
       
-        Complex2 z;        
+        
+        Complex z;
         
         for (int j = 0; j < getHeight(); ++j)
         {
             for (int i = 0; i < getWidth(); ++i)
             {
                 int index = j * getWidth() + i;
-                z = new Complex2(_min.getReal() + (_max.getReal() - _min.getReal()) * i / getWidth(),
+                z = new Complex(_min.getReal() + (_max.getReal() - _min.getReal()) * i / getWidth(),
                                  _min.getImaginary()+ (_max.getImaginary() - _min.getImaginary()) * j / getHeight());
-                imagePixelData[index] = z.color().getRGB();
+                //z = z.log();
+                //z = z.sqrt();
+                imagePixelData[index] = Complex2.color(_evaltor.f(z)).getRGB();
             }
         }
       

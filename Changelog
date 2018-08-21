@@ -1,3 +1,8 @@
+Version 1.0.3
+    - Complex2 doesn't inherit Complex, instead just implements static color function. 
+      (this avoids the issue of converting from Complex to Complex2.
+    - Evaluator and Token class added
+
 Version 1.0.2
     - Successfully created basic landscape - yay!
 
