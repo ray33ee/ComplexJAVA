@@ -101,8 +101,6 @@ public class ComplexComponent extends JComponent {
                 int index = j * getWidth() + i;
                 z = new Complex(_min.getReal() + (_max.getReal() - _min.getReal()) * i / getWidth(),
                                  _min.getImaginary()+ (_max.getImaginary() - _min.getImaginary()) * j / getHeight());
-                //z = z.log();
-                //z = z.sqrt();
                 imagePixelData[index] = Complex2.color(_evaltor.f(z)).getRGB();
             }
         }
