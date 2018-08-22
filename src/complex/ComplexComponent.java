@@ -85,30 +85,26 @@ public class ComplexComponent extends JComponent {
      */
     private Image drawImage(){
        
-        int w = getWidth();
-        int h = getHeight();
         
-        int threadcount = 16;
+        int threadcount = 8;
        
         BufferedImage bufferedImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         int[] imagePixelData = ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
-      
-        
         Concurrent[] threads = new Concurrent[threadcount];
         
-        //Concurrent c = new Concurrent(_evaltor, 0, getWidth(), getHeight(), _min, _max, imagePixelData);
+        double diff = _max.getImaginary() - _min.getImaginary();
+        int blocksize = (getHeight() / threadcount) * getWidth();  
         
         for (int i = 0; i < threadcount; ++i)
         {
-            threads[i] = new Concurrent(_evaltor, getWidth() * getHeight() / threadcount * i, getWidth(), getHeight() / threadcount, _min, _max, imagePixelData);
+            threads[i] = new Concurrent(_evaltor, blocksize * i, getWidth(), getHeight() / threadcount, 
+                    new Complex(_min.getReal(), _min.getImaginary() + diff / threadcount * i), 
+                    new Complex(_max.getReal(), _min.getImaginary() + diff / threadcount * (i+1)), imagePixelData);
             threads[i].start();
         }
         
-        //c.start();
-        
         try 
         {
-            //c.join();
             for (int i = 0; i < threadcount; ++i)
                 threads[i].join();
         } 

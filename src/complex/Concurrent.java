@@ -15,17 +15,17 @@ public class Concurrent extends Thread {
     
     private Thread            _thread;
     
-    private int         _start;
+    private final int         _start;
     
-    private Evaluator   _evaltor;
+    private final Evaluator   _evaltor;
     
-    private Complex     _min;
-    private Complex     _max;
+    private final Complex     _min;
+    private final Complex     _max;
     
-    private int         _width;
-    private int         _height;
+    private final int         _width;
+    private final int         _height;
     
-    private int[]       _data;
+    private final int[]       _data;
     
         
     public Concurrent(Evaluator eval, int start, int width, int height, Complex min, Complex max, int[] data)

@@ -37,19 +37,19 @@ public class Evaluator {
      */
     public void setString(String formula)
     {
-        _tokenlist = new Token[8];
+        _tokenlist = new Token[1];
         
         _tokenlist[0] = new Token(new Complex(0,0), Token.INSTRUCTION.VARIABLE);
-        _tokenlist[1] = new Token(new Complex(2,0), Token.INSTRUCTION.CONSTANT);
-        _tokenlist[2] = new Token(new Complex(4,0), Token.INSTRUCTION.OPERATOR);
+        /*_tokenlist[1] = new Token(new Complex(2,0), Token.INSTRUCTION.CONSTANT);
+        _tokenlist[2] = new Token(new Complex(4,0), Token.INSTRUCTION.OPERATOR);*/
         
-        _tokenlist[3] = new Token(new Complex(0,0), Token.INSTRUCTION.VARIABLE);
+        /*_tokenlist[3] = new Token(new Complex(0,0), Token.INSTRUCTION.VARIABLE);
         _tokenlist[4] = new Token(new Complex(2,0), Token.INSTRUCTION.CONSTANT);
         _tokenlist[5] = new Token(new Complex(2,0), Token.INSTRUCTION.OPERATOR);
         
         _tokenlist[6] = new Token(new Complex(0,0), Token.INSTRUCTION.OPERATOR);
         
-        _tokenlist[7] = new Token(new Complex(8,0), Token.INSTRUCTION.OPERATOR);
+        _tokenlist[7] = new Token(new Complex(8,0), Token.INSTRUCTION.OPERATOR);*/
         
         
         _stackmax = 5;

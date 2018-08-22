@@ -1,3 +1,6 @@
+Version 1.0.6
+    - Multithreading implemented, broken image bug fixed
+
 Version 1.0.5
     - Renamed 'classes' folder to 'complex'
     - Renamed 'Complex2' to 'ComplexColor'
