@@ -11,7 +11,7 @@
 package complexjava;
 
 import javax.swing.JFrame;
-import complex.ComplexComponent;
+import widget.ComplexComponent;
 import org.apache.commons.math3.complex.Complex;
 
 /**
@@ -24,7 +24,7 @@ public class ComplexJAVA  {
      * @param args the command line arguments
      */
    public static void main(String[] args) {
-        ComplexComponent pan = new ComplexComponent(new Complex(-4,-4), new Complex(4,4));
+        ComplexComponent pan = new ComplexComponent(new Complex(-10,-10), new Complex(10,10));
         JFrame frame = new JFrame();
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

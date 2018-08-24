@@ -1,3 +1,9 @@
+Version 1.1.2
+    - Move project cleaning
+    - Added Evaulator and Token classes back (for trace anad newton raphson
+    - Local memory implemented for staack, calculatins moved from kernel to evaulator function
+
+
 Version 1.1.1
     - Clean project folder
     - Kernel moved to folder, C include files created and placed in /include/

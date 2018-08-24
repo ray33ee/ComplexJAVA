@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package complex;
+package widget;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -48,7 +48,7 @@ public class ComplexComponent extends JComponent {
         _max = max;
         _context = JavaCL.createBestContext(CLPlatform.DeviceFeature.GPU);
         
-        
+        System.out.println("Local memory size: " + _context.getDevices()[0].getLocalMemSize());
                 
         for (int i = 0; i < JavaCL.listPlatforms().length; ++i)
         {
@@ -61,7 +61,7 @@ public class ComplexComponent extends JComponent {
         try
         {
             _queue = _context.createDefaultQueue();
-            String src = IOUtils.readText(ComplexComponent.class.getResource("/kernel/TutorialKernels.cl"));
+            String src = IOUtils.readText(ComplexComponent.class.getResource("/kernel/kernel.cl"));
             CLProgram program = _context.createProgram(src);
             program.addInclude("/include/");
             _kernel = program.createKernel("get_landscape");
@@ -95,6 +95,11 @@ public class ComplexComponent extends JComponent {
     public int getHeight()
     {
         return super.getHeight() - 10 ;
+    }
+    
+    public int getArea()
+    {
+        return getWidth() * getHeight();
     }
     
     /**
@@ -131,9 +136,7 @@ public class ComplexComponent extends JComponent {
         int[] imagePixelData = ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
         
         
-        int area = getWidth() * getHeight();
-             
-        
+                
         /*Pointer<Double>
             aPtr = allocateDoubles(n).order(byteOrder),
             bPtr = allocateDoubles(n).order(byteOrder);*/
@@ -144,25 +147,25 @@ public class ComplexComponent extends JComponent {
             b = context.createDoubleBuffer(CLMem.Usage.Input, bPtr);*/
         
         // Create an OpenCL output buffer :
-        CLBuffer<Integer> _outbuff = _context.createIntBuffer(CLMem.Usage.Output, area);
+        CLBuffer<Integer> _outbuff = _context.createIntBuffer(CLMem.Usage.Output, getArea());
         
         // Get and call the kernel :
-        _kernel.setArgs(-3.0f, -3.0f, 6.0f, 6.0f, getWidth(), getHeight(), _outbuff, area);
-        int[] globalSizes = new int[] { area };
-
+        _kernel.setArgs(
+                (float)_min.getReal(), 
+                (float)_min.getImaginary(), 
+                (float)(_max.getReal() - _min.getReal()), 
+                (float)(_max.getImaginary() - _min.getImaginary()),
+                getWidth(), getHeight(), _outbuff, getArea());
+        _kernel.setLocalArg(8, 4 * 2 * 100);
+        
+        int[] globalSizes = new int[] { getArea() };
+        
+        //Send kernel to event queue
         CLEvent addEvt = _kernel.enqueueNDRange(_queue, globalSizes);
+        
+        //Wait for completion and get results
         _outbuff.read(_queue, addEvt).getInts(imagePixelData); // blocks until add_floats finished
 
-        // Print the first 10 output values :
-        /*for (int i = 0; i < 10 && i < area; i++)
-            System.out.println("out[" + i + "] = " + imagePixelData[i]);
-
-        for (int i = area - 10; i < area; i++)
-            System.out.println("out[" + i + "] = " + imagePixelData[i]);*/
-        
-        
-        
-        
         return bufferedImage;
    }
     
