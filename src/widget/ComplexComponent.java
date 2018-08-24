@@ -18,23 +18,26 @@ import com.nativelibs4java.opencl.util.*;
 import com.nativelibs4java.util.*;
 import java.awt.image.Raster;
 import org.bridj.Pointer;
-import java.nio.ByteOrder;
 import static org.bridj.Pointer.*;
 import static java.lang.Math.*;
 import java.io.IOException;
 import java.net.URL;
 
+import complex.Token;
+
 /**
- *
+ *  ComplexComponent is a widget responsible for painting complex landscapes
  * @author Will
  */
 public class ComplexComponent extends JComponent {
     
     private Complex     _min;
     private Complex     _max;
-    private CLContext _context;
-    private CLKernel _kernel;
-    private CLQueue _queue;
+    private Token[]     _tokens;
+    private int         _stackmax;
+    private CLContext   _context;
+    private CLKernel    _kernel;
+    private CLQueue     _queue;
     
     /**
      * Construct Complex component and initialise JComponent and member variables.
@@ -47,6 +50,10 @@ public class ComplexComponent extends JComponent {
         _min = min;
         _max = max;
         _context = JavaCL.createBestContext(CLPlatform.DeviceFeature.GPU);
+        
+        _tokens = new Token[] { new Token(new Complex(0, 0), Token.INSTRUCTION.VARIABLE),
+                                new Token(new Complex(8, 0), Token.INSTRUCTION.OPERATOR) };
+        _stackmax = 1;
         
         System.out.println("Local memory size: " + _context.getDevices()[0].getLocalMemSize());
                 
@@ -130,33 +137,39 @@ public class ComplexComponent extends JComponent {
      * @return the image of the landscape
      */
     private Image drawImage(){
-       
-       
+        
         BufferedImage bufferedImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         int[] imagePixelData = ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
         
+        //Token list is implemented as a list of floats. Each group of three floats represents real, imaginary and type of a token
+        Pointer<Float> tokenPtr = allocateFloats(_tokens.length * 3); //.order(_context.getByteOrder());
         
+        //Copy tokens
+        for (int i = 0; i < _tokens.length; ++i)
+        {
+            tokenPtr.set(3*i, (float)_tokens[i].getData().getReal());
+            tokenPtr.set(3*i+1, (float)_tokens[i].getData().getImaginary());
+            tokenPtr.set(3*i+2, (float)_tokens[i].getInt());
+        }
+        
+        //Create input buffer for token list
+        CLBuffer<Float> tokenBuff = _context.createFloatBuffer(CLMem.Usage.Input, tokenPtr);
+        
+        // Create output buffer for colour array :
+        CLBuffer<Integer> outbuff = _context.createIntBuffer(CLMem.Usage.Output, getArea());
+        
+        CLBuffer<Double> stackbuff = _context.createDoubleBuffer(CLMem.Usage.Output, getArea() * _stackmax * 2);
                 
-        /*Pointer<Double>
-            aPtr = allocateDoubles(n).order(byteOrder),
-            bPtr = allocateDoubles(n).order(byteOrder);*/
-        
-        // Create OpenCL input buffers (using the native memory pointers aPtr and bPtr) :
-        /*CLBuffer<Double> 
-            a = context.createDoubleBuffer(CLMem.Usage.Input, aPtr),
-            b = context.createDoubleBuffer(CLMem.Usage.Input, bPtr);*/
-        
-        // Create an OpenCL output buffer :
-        CLBuffer<Integer> _outbuff = _context.createIntBuffer(CLMem.Usage.Output, getArea());
-        
         // Get and call the kernel :
         _kernel.setArgs(
+                tokenBuff,
+                _tokens.length,
                 (float)_min.getReal(), 
                 (float)_min.getImaginary(), 
                 (float)(_max.getReal() - _min.getReal()), 
                 (float)(_max.getImaginary() - _min.getImaginary()),
-                getWidth(), getHeight(), _outbuff, getArea());
-        _kernel.setLocalArg(8, 4 * 2 * 100);
+                getWidth(), getHeight(), outbuff, getArea(), _stackmax, stackbuff);
+        //_kernel.setLocalArg(10, 8 * 2* 50); //When adding argumnts to _kernel, be sure to update the first argument of this function
         
         int[] globalSizes = new int[] { getArea() };
         
@@ -164,7 +177,10 @@ public class ComplexComponent extends JComponent {
         CLEvent addEvt = _kernel.enqueueNDRange(_queue, globalSizes);
         
         //Wait for completion and get results
-        _outbuff.read(_queue, addEvt).getInts(imagePixelData); // blocks until add_floats finished
+        outbuff.read(_queue, addEvt).getInts(imagePixelData); // blocks until add_floats finished
+        
+        /*for (int i = 0; i < 1000; ++i)
+            System.out.println("ID: " + imagePixelData[i]);*/
 
         return bufferedImage;
    }

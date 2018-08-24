@@ -32,6 +32,13 @@ struct Complex
     real im;
 };
 
+struct Token
+{
+    float re;
+    float im;
+    float type;
+};
+
 real c_abs(struct Complex);
 
 real c_arg(struct Complex);
@@ -120,7 +127,10 @@ struct Complex c_pow(struct Complex z, struct Complex w)
     return c_exp(c_mul(z, c_ln(w)));
 }
 
-struct Complex c_log(struct Complex z, struct Complex w);
+struct Complex c_log(struct Complex z, struct Complex w)
+{
+    return c_div(c_ln(z), c_ln(w));
+}
 
 struct Complex c_neg(struct Complex z)
 {
@@ -163,29 +173,29 @@ struct Complex c_exp(struct Complex z)
     return ans;
 }
 
-struct Complex c_sinh(struct Complex z);
+struct Complex c_sinh(struct Complex z) { return c_complexc(-1, -1); }
 
-struct Complex c_cosh(struct Complex z);
+struct Complex c_cosh(struct Complex z) { return c_complexc(-1, -1); }
 
-struct Complex c_tanh(struct Complex z);
+struct Complex c_tanh(struct Complex z) { return c_complexc(-1, -1); }
 
-struct Complex c_sin(struct Complex z);
+struct Complex c_sin(struct Complex z) { return c_complexc(-1, -1); }
 
-struct Complex c_cos(struct Complex z);
+struct Complex c_cos(struct Complex z) { return c_complexc(-1, -1); }
 
-struct Complex c_tan(struct Complex z);
+struct Complex c_tan(struct Complex z) { return c_complexc(-1, -1); }
 
-struct Complex c_asinh(struct Complex z);
+struct Complex c_asinh(struct Complex z) { return c_complexc(-1, -1); }
 
-struct Complex c_acosh(struct Complex z);
+struct Complex c_acosh(struct Complex z) { return c_complexc(-1, -1); }
 
-struct Complex c_atanh(struct Complex z);
+struct Complex c_atanh(struct Complex z) { return c_complexc(-1, -1); }
 
-struct Complex c_asin(struct Complex z);
+struct Complex c_asin(struct Complex z) { return c_complexc(-1, -1); }
 
-struct Complex c_acos(struct Complex z);
+struct Complex c_acos(struct Complex z) { return c_complexc(-1, -1); }
 
-struct Complex c_atan(struct Complex z);
+struct Complex c_atan(struct Complex z) { return c_complexc(-1, -1); }
 
 /**
  * Function gets the absolute value of the complex number
@@ -292,21 +302,31 @@ struct ARGB c_colour(struct Complex z)
     return HLtoRGB(hue, lightness);
 }
 
-struct Complex evaluate(__global float* tokens, __local struct Complex* stack, struct Complex z)
+struct Complex evaluate(__global struct Token* tokens, int tokens_count, __local struct Complex* stack, struct Complex z)
 {
     int pointer = 0;
     
-    //push z
-    stack[pointer] = z;
-    ++pointer;
-
-    //push z
-    stack[pointer] = z;
-    ++pointer;
-
-    //pop z, pop z, push z^z
-    --pointer;
-    stack[pointer-1] = c_pow(stack[pointer-1], stack[pointer]);
+    //variable op constant
+    for (int i = 0; i < tokens_count; ++i)
+    {
+        switch ((int)tokens[i].type)
+        {
+            case 1:
+                stack[pointer] = z;
+                ++pointer;
+                break;
+            case 2:
+                switch ((int)tokens[i].re)
+                {
+                    
+                }
+                break;
+            case 3:
+                stack[pointer].re = (real)tokens[i].re;
+                stack[pointer].im = (real)tokens[i].im;
+                ++pointer;
+        }
+    }
     
     return stack[pointer-1];
 }

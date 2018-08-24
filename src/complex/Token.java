@@ -66,6 +66,24 @@ public class Token {
     }
     
     /**
+     * Get the _type as an integer 
+     * @return the _type converted to int
+     */
+    public int getInt()
+    {
+        switch (_type)
+        {
+            case VARIABLE:
+                return 1;
+            case OPERATOR:
+                return 2;
+            case CONSTANT:
+                return 3;
+        }
+        return 0;
+    }
+    
+    /**
      * Set the data in the token
      * @param data the data to set
      */
