@@ -1,3 +1,7 @@
+Version 1.1.0
+    - OpenCL implementation
+    - Support for double or single precision
+
 Version 1.0.6
     - Multithreading implemented, broken image bug fixed
 
