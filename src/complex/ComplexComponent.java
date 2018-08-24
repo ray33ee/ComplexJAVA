@@ -61,10 +61,11 @@ public class ComplexComponent extends JComponent {
         try
         {
             _queue = _context.createDefaultQueue();
-            String src = IOUtils.readText(ComplexComponent.class.getResource("TutorialKernels.cl"));
+            String src = IOUtils.readText(ComplexComponent.class.getResource("/kernel/TutorialKernels.cl"));
             CLProgram program = _context.createProgram(src);
+            program.addInclude("/include/");
             _kernel = program.createKernel("get_landscape");
-
+            
             for (int i = 0; i < _context.getDevices().length; ++i)
                 System.out.println("Using Device " + i + " " + _context.getDevices()[i].getName());
             
@@ -146,7 +147,7 @@ public class ComplexComponent extends JComponent {
         CLBuffer<Integer> _outbuff = _context.createIntBuffer(CLMem.Usage.Output, area);
         
         // Get and call the kernel :
-        _kernel.setArgs(-3.0f, -3.0f, 3.0f, 3.0f, getWidth(), getHeight(), _outbuff, area);
+        _kernel.setArgs(-3.0f, -3.0f, 6.0f, 6.0f, getWidth(), getHeight(), _outbuff, area);
         int[] globalSizes = new int[] { area };
 
         CLEvent addEvt = _kernel.enqueueNDRange(_queue, globalSizes);

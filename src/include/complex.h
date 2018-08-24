@@ -1,26 +1,5 @@
 
-#if defined(cl_khr_fp64)  // Khronos extension available?
-#pragma OPENCL EXTENSION cl_khr_fp64 : enable
-#define DOUBLE_SUPPORT_AVAILABLE
-#elif defined(cl_amd_fp64)  // AMD extension available?
-#pragma OPENCL EXTENSION cl_amd_fp64 : enable
-#define DOUBLE_SUPPORT_AVAILABLE
-#endif
-
-#if defined(DOUBLE_SUPPORT_AVAILABLE)
-
-// double
-typedef double real;
-#define PI 3.14159265358979323846
-
-
-#else
-
-// float
-typedef float real;
-#define PI 3.14159265359f
-
-#endif
+#include "real.h"
 
 struct Complex
 {
@@ -141,32 +120,4 @@ struct ARGB c_colour(struct Complex z)
     hue /= 2.0 * PI;
 
     return HLtoRGB(hue, 0.5);
-}
-
-__kernel void get_landscape(float fminRe, float fminIm, float fmaxRe, float fmaxIm, int width, int height, __global struct ARGB* colours, int n) 
-{
-    int i = get_global_id(0);
-
-    if (i >= n)
-        return;
-
-    int x = i % width;
-    int y = i / width;
-
-    real minRe = (real)fminRe;
-    real minIm = (real)fminIm;
-    real maxRe = (real)fmaxRe;
-    real maxIm = (real)fmaxIm;
-
-    real diffRe = maxRe - minRe;
-    real diffIm = maxIm - minIm;
-
-    struct Complex z;
-
-    z.re = minRe + diffRe / width * x;
-    z.im = minIm + diffIm / height * y;
-
-    struct Complex ans = c_addr(c_addc(c_mulc(z,z), c_mulr(z, 2)), 2);
-
-    colours[i] = c_colour(ans);
 }
