@@ -20,14 +20,39 @@ public class Evaluator {
     private Token[] _tokenlist;
     private int     _stackmax;
     
+    /**
+     * Constructs an instance of Evaulator, with the formula "z".
+     */
     public Evaluator()
     {
         this("z");
     }
     
+    /**
+     * Constructs an instance of Evaulator with a specific formula
+     * @param formula the equation to convert
+     */
     public Evaluator(String formula)
     {
         setString(formula);
+    }
+    
+    /**
+     * Obtains a copy (via clone) of the list of tokens
+     * @return a copy of the array of tokens stored
+     */
+    public Token[] getTokens()
+    {
+        return _tokenlist.clone();
+    }
+    
+    /**
+     * Get the maximum size of the stack required for a single evaulation of the formula.
+     * @return the maximum size that an evaluating stack can grow to
+     */
+    public int getStackMax()
+    {
+        return _stackmax;
     }
     
     /**

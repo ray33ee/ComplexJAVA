@@ -1,3 +1,7 @@
+Version 1.1.4
+    - Fixed crashing GPU bug
+    - Host code now creates float or double buffer depending on double precision support
+
 Version 1.1.3
     - Global stack implemented
     - Function evaluator code in kernel complete

@@ -113,6 +113,12 @@ struct Complex c_mul(struct Complex z, struct Complex w)
     return ans;
 }
 
+/**
+ * Divides one complex number by another
+ * @param z the first complex operand
+ * @param w the second complex operand
+ * @return z / w
+ */
 struct Complex c_div(struct Complex z, struct Complex w)
 {
     struct Complex ans;
@@ -122,16 +128,36 @@ struct Complex c_div(struct Complex z, struct Complex w)
     return ans;
 }
 
+/**
+ * Raises a complex number to the power of another. Note that for the square root of 
+ * a complex number, c_sqrt is faster.
+ * @param z the base 
+ * @param w the power 
+ * @return z to the power of w, z^w
+ * @see c_sqrt(struct Complex)
+ */
 struct Complex c_pow(struct Complex z, struct Complex w)
 {
-    return c_exp(c_mul(z, c_ln(w)));
+    return c_exp(c_mul(w, c_ln(z)));
 }
 
+/**
+ * Gets the log of the first operand to the base of the second 
+ * @param z the first complex operand
+ * @param w the second complex operand
+ * @return the log of z to the base w, log_w(z)
+ * @see c_ln(struct Complex)
+ */
 struct Complex c_log(struct Complex z, struct Complex w)
 {
     return c_div(c_ln(z), c_ln(w));
 }
 
+/**
+ * Gets the negative complex number
+ * @param z the complec operand
+ * @returns -z
+ */
 struct Complex c_neg(struct Complex z)
 {
     struct Complex ans;
@@ -140,6 +166,11 @@ struct Complex c_neg(struct Complex z)
     return ans;
 }
 
+/**
+ * Gets the complex conjugate of the complex number
+ * @param z the complex operand
+ * @return the complex conjugate of z
+ */
 struct Complex c_conj(struct Complex z)
 {
     struct Complex ans;
@@ -148,6 +179,12 @@ struct Complex c_conj(struct Complex z)
     return ans;
 }
 
+/**
+ * Gets the square root of the complex number using fast algebraic solution. This 
+ * function is faster than c_pow and should be used instead of c_pow(z, 0.5).
+ * @param z the complex operand
+ * @return the square root of z
+ */
 struct Complex c_sqrt(struct Complex z)
 {
     struct Complex ans;
@@ -157,6 +194,11 @@ struct Complex c_sqrt(struct Complex z)
     return ans;
 };
 
+/**
+ * Gets the natural logarithm of the complex number
+ * @param z the complex operand
+ * @return the log to the base e of z.
+ */
 struct Complex c_ln(struct Complex z)
 {
     struct Complex ans;
@@ -165,6 +207,12 @@ struct Complex c_ln(struct Complex z)
     return ans;
 }
 
+/**
+ * Gets the exponent of the complex number. Note this is faster than c_pow
+ * and should be prefered to c_pow(e, z).
+ * @param z the complex operand
+ * @return e^z
+ */
 struct Complex c_exp(struct Complex z)
 {
     struct Complex ans;
@@ -302,31 +350,112 @@ struct ARGB c_colour(struct Complex z)
     return HLtoRGB(hue, lightness);
 }
 
-struct Complex evaluate(__global struct Token* tokens, int tokens_count, __local struct Complex* stack, struct Complex z)
+struct Complex evaluate(__global struct Token* tokens, __global struct Complex* stack, int token_count, int area, int i, struct Complex z)
 {
-    int pointer = 0;
+    int pointer = i;
     
     //variable op constant
-    for (int i = 0; i < tokens_count; ++i)
+    for (int cnt = 0; cnt < token_count; ++cnt)
     {
-        switch ((int)tokens[i].type)
+        switch ((int)tokens[cnt].type)
         {
             case 1:
                 stack[pointer] = z;
-                ++pointer;
+                pointer += area;
                 break;
             case 2:
-                switch ((int)tokens[i].re)
+                switch ((int)tokens[cnt].re)
                 {
-                    
+                    case 0:
+                        pointer -= area;
+                        stack[pointer-area] = c_add(stack[pointer-area], stack[pointer]);
+                        break;
+                    case 1:
+                        pointer -= area;
+                        stack[pointer-area] = c_sub(stack[pointer-area], stack[pointer]);
+                        break;
+                    case 2:
+                        pointer -= area;
+                        stack[pointer-area] = c_mul(stack[pointer-area], stack[pointer]);
+                        break;
+                    case 3:
+                        pointer -= area;
+                        stack[pointer-area] = c_div(stack[pointer-area], stack[pointer]);
+                        break;
+                    case 4:
+                        pointer -= area;
+                        stack[pointer-area] = c_pow(stack[pointer-area], stack[pointer]);
+                        break;
+                    case 5:
+                        pointer -= area;
+                        stack[pointer-area] = c_log(stack[pointer-area], stack[pointer]);
+                        break;
+                    case 6:
+                        stack[pointer-area] = c_neg(stack[pointer-area]);
+                        break;
+                    case 7:
+                        stack[pointer-area] = c_conj(stack[pointer-area]);
+                        break;
+                    case 8:
+                        stack[pointer-area] = c_sqrt(stack[pointer-area]);
+                        break;
+                    case 9:
+                        stack[pointer-area] = c_ln(stack[pointer-area]);
+                        break;
+                    case 10:
+                        stack[pointer-area] = c_exp(stack[pointer-area]);
+                        break;
+                    case 11:
+                        stack[pointer-area] = c_sinh(stack[pointer-area]);
+                        break;
+                    case 12:
+                        stack[pointer-area] = c_cosh(stack[pointer-area]);
+                        break;
+                    case 13:
+                        stack[pointer-area] = c_tanh(stack[pointer-area]);
+                        break;
+                    case 14:
+                        stack[pointer-area] = c_sin(stack[pointer-area]);
+                        break;
+                    case 15:
+                        stack[pointer-area] = c_cos(stack[pointer-area]);
+                        break;
+                    case 16:
+                        stack[pointer-area] = c_tan(stack[pointer-area]);
+                        break;
+                    case 17:
+                        stack[pointer-area] = c_asinh(stack[pointer-area]);
+                        break;
+                    case 18:
+                        stack[pointer-area] = c_acosh(stack[pointer-area]);
+                        break;
+                    case 19:
+                        stack[pointer-area] = c_atanh(stack[pointer-area]);
+                        break;
+                    case 20:
+                        stack[pointer-area] = c_asin(stack[pointer-area]);
+                        break;
+                    case 21:
+                        stack[pointer-area] = c_acos(stack[pointer-area]);
+                        break;
+                    case 22:
+                        stack[pointer-area] = c_atan(stack[pointer-area]);
+                        break;
+                    case 23:
+                        stack[pointer-area] = c_complexr(c_abs(stack[pointer-area]));
+                        break;
+                    case 24:
+                        stack[pointer-area] = c_complexr(c_arg(stack[pointer-area]));
+                        break;
                 }
                 break;
             case 3:
-                stack[pointer].re = (real)tokens[i].re;
-                stack[pointer].im = (real)tokens[i].im;
-                ++pointer;
+                stack[pointer].re = (real)tokens[cnt].re;
+                stack[pointer].im = (real)tokens[cnt].im;
+                pointer += area;
+                break;
         }
     }
     
-    return stack[pointer-1];
+    return stack[pointer-area];
 }

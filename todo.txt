@@ -1,0 +1,2 @@
+- Allow user to prioritise speed (CLPlatform.DeviceFeature.MaxComputeUnits) or prioritise accuracy (CLPlatform.DeviceFeature.DoubleSupport)
+- Add code to select between float and double in host (check via CLContext.isDoubleSupported())
