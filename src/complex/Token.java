@@ -8,11 +8,11 @@ package complex;
 import org.apache.commons.math3.complex.Complex;
 
 /**
- *  Token class, contains _data and _type, which explains how _data should be treated.
- *  The formula is converted from a sting to an array of tokens. 
+ *  Token class, represents an individual token. This token can either be the independenet variable, a constant or a function/operator. 
+ *  It contains _data and _type, which explains how _data should be treated.
  * @author Will
  */
-public class Token {
+public class Token extends Object {
     
     /**
      * An enum containing the 'type' of data in the token. EMPTY is the value 
@@ -24,8 +24,20 @@ public class Token {
      */
     public enum INSTRUCTION { EMPTY, VARIABLE, OPERATOR, CONSTANT }
     
+    /**
+     * Data in the token. This could be a constant or an index to a function
+     */
     private Complex     _data;
+    
+    /**
+     * The type of token. Use _type to decode the data.
+     */
     private INSTRUCTION _type;
+    
+    /**
+     * List of all functions, used in toString().
+     */
+    private static final String[] functions = { "+", "-", "*", "/", "^", "log", "neg", "conj", "sqrt", "ln", "exp", "sinh", "cosh", "tanh", "sin", "cos", "tan", "asinh", "acosh", "atanh", "asin", "acos", "atan", "inv", "mod", "arg" };
     
     /**
      * Constructs empty token, with data = 0 and type = EMPTY.
@@ -99,5 +111,21 @@ public class Token {
     public void setInstruction(INSTRUCTION type)
     {
         _type = type;
+    }
+    
+    /**
+     * Convert token to string format
+     * @return token as a string
+     */
+    public String toString()
+    {
+        if (_type == INSTRUCTION.VARIABLE)
+            return "z";
+        else if (_type == INSTRUCTION.CONSTANT)
+            return _data.toString();
+        else if (_type == INSTRUCTION.OPERATOR)
+            return functions[(int)_data.getReal()];
+        else
+            return "NULL";
     }
 }

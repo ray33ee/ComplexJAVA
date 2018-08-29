@@ -1,2 +1,4 @@
 - Allow user to prioritise speed (CLPlatform.DeviceFeature.MaxComputeUnits) or prioritise accuracy (CLPlatform.DeviceFeature.DoubleSupport)
 - Add code to select between float and double in host (check via CLContext.isDoubleSupported())
+- Update domain colouring algorithm in ComplexColor.Java to match OpenCL kernel domain colouring
+- Add asinh, acosh and atanh functions to Evaluator.f(Complex) function)

@@ -5,6 +5,8 @@
  */
 package complex;
 
+import java.util.Stack;
+import java.util.Vector;
 import org.apache.commons.math3.complex.Complex;
 
 /**
@@ -17,7 +19,19 @@ import org.apache.commons.math3.complex.Complex;
  */
 public class Evaluator {
     
+    /**
+     * List of all functions (excludes operators)
+     */
+    private static final String[] functions = { "log", "neg", "conj", "sqrt", "ln", "exp", "sinh", "cosh", "tanh", "sin", "cos", "tan", "asinh", "acosh", "atanh", "asin", "acos", "atan", "inv", "mod", "arg" };
+    
+    /**
+     * The formula represented as a list of tokens
+     */
     private Token[] _tokenlist;
+    
+    /**
+     * The maximum size the stack can grow to when evaluating tokenlist
+     */
     private int     _stackmax;
     
     /**
@@ -25,7 +39,7 @@ public class Evaluator {
      */
     public Evaluator()
     {
-        this("z");
+        setString("z");
     }
     
     /**
@@ -47,7 +61,7 @@ public class Evaluator {
     }
     
     /**
-     * Get the maximum size of the stack required for a single evaulation of the formula.
+     * Get the maximum size of the stack required for a single evaluation of the formula.
      * @return the maximum size that an evaluating stack can grow to
      */
     public int getStackMax()
@@ -62,22 +76,8 @@ public class Evaluator {
      */
     public void setString(String formula)
     {
-        _tokenlist = new Token[8];
-        
-        _tokenlist[0] = new Token(new Complex(0,0), Token.INSTRUCTION.VARIABLE);
-        _tokenlist[1] = new Token(new Complex(2,0), Token.INSTRUCTION.CONSTANT);
-        _tokenlist[2] = new Token(new Complex(4,0), Token.INSTRUCTION.OPERATOR);
-        
-        _tokenlist[3] = new Token(new Complex(0,0), Token.INSTRUCTION.VARIABLE);
-        _tokenlist[4] = new Token(new Complex(2,0), Token.INSTRUCTION.CONSTANT);
-        _tokenlist[5] = new Token(new Complex(2,0), Token.INSTRUCTION.OPERATOR);
-        
-        _tokenlist[6] = new Token(new Complex(0,0), Token.INSTRUCTION.OPERATOR);
-        
-        _tokenlist[7] = new Token(new Complex(8,0), Token.INSTRUCTION.OPERATOR);
-        
-        
-        _stackmax = 5;
+        _tokenlist = processString(formula);
+        calculateStackmax();
     }
     
     /**
@@ -199,4 +199,302 @@ public class Evaluator {
         return stack[pointer-1];
     }
     
+    private static boolean isNum(char ch)
+    {
+        return ch >= '0' && ch <= '9';
+    }
+    
+    private static boolean isLetter(char ch)
+    {
+        return ch >= 'a' && ch <= 'z';
+    }
+    
+    /**
+     * Determines whether the string can be converted to a valid number
+     * @param str the string to test
+     * @return true if str can be written as a number, false otherwise
+     */
+    private static boolean isNum(String str)
+    {
+        try 
+        {
+            Double.parseDouble(str);
+        }
+        catch (NumberFormatException e)
+        {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Determines whether the string is an operator
+     * @param str the string to test
+     * @return true if str is one of the following - +, -, *, /, ^ or neg (unary negate)
+     */
+    private static boolean isOp(String str)
+    {
+        return str.equals("+") || str.equals("-") || str.equals("*") || str.equals("/") || str.equals("^") || str.equals("neg" );
+    }
+    
+    /**
+     * Determines whether the string is a function
+     * @param str the string to test
+     * @return true if the str is in the 'functions' list
+     */
+    private static boolean isFunction(String str)
+    {
+        for (int i = 0; i < functions.length; ++i)
+            if (str.equals(functions[i]))
+                return true;
+        return false;
+    }
+    
+    /**
+     * Get the precedence of the operator, from 1 to 3.
+     * @param token
+     * @return the precedence from 1 (lowest) to 3 (highest)
+     */
+    private static int getPrecedence(String token)
+    {
+        if (token.equals("+") || token.equals("-"))
+            return 1;
+        else if (token.equals("*") || token.equals("/"))
+            return 2;
+        else if (token.equals("neg"))
+            return 3;
+        else //if (token == "^")
+            return 4;
+    }
+    
+    /**
+     * Get the index of the function/operator ready to store directly in Token.data. This
+     * is represented as a number from 0 to 24.
+     * @param str string operator
+     * @return the index from 0 to 24.
+     */
+    private static int getIndex(String str)
+    {
+        if (isOp(str) && !str.equals("neg"))
+        {
+            if (str.equals("+"))
+                return 0;
+            else if (str.equals("-"))
+                return 1;
+            else if (str.equals("*"))
+                return 2;
+            else if (str.equals("/"))
+                return 3;
+            else if (str.equals("^"))
+                return 4;
+        }
+        else
+        {
+            for (int i = 0; i < functions.length; ++i)
+                if (str.equals(functions[i]))
+                    return i + 5;
+        }
+        return -1;
+    }
+    
+    /**
+     * Determines whether the current token represents the unary negate
+     * @param output
+     * @param opStack
+     * @param token
+     * @return 
+     */
+    private static boolean isUnaryNegative(Vector<Token> output, Stack<String> opStack, String prevToken)
+    {
+        return (output.size()== 0 && opStack.size() == 0) || prevToken.equals("(") || prevToken.equals("neg") || isOp(prevToken);
+    }
+    
+    /**
+     * Removes all whitespace from the string
+     * @param str string to remove
+     */
+    private static String removeWhitespace(String str)
+    {
+        String ans = "";
+        
+        for (int i = 0; i < str.length(); ++i)
+            if (str.charAt(i) != ' ' && str.charAt(i) != '\n' && str.charAt(i) != '\t')
+                ans += str.charAt(i);
+        
+        return ans;
+    }
+    
+    /**
+     * Takes a string token, applies shunting yard algorithm to convert 
+     * infix to RPN, then converts to Token type.
+     * @param output the final output list
+     * @param opStack the stack of operators
+     * @param token the token to push
+     */
+    private static void sendToken(Vector<Token> output, Stack<String> opStack, String token, String prev)
+    {
+        if (token != "")
+        {
+            if (token.equals("z"))
+                output.add(new Token(new Complex(0), Token.INSTRUCTION.VARIABLE));
+            else if (isNum(token))
+                output.add(new Token(new Complex(Double.parseDouble(token)), Token.INSTRUCTION.CONSTANT));
+            else if (token.equals("i"))
+                output.add(new Token(new Complex(0, 1), Token.INSTRUCTION.CONSTANT));
+            else if (token.equals("pi"))
+                output.add(new Token(new Complex(Math.PI), Token.INSTRUCTION.CONSTANT));
+            else if (token.equals("e"))
+                output.add(new Token(new Complex(Math.E), Token.INSTRUCTION.CONSTANT));
+            else if (isFunction(token))
+                opStack.push(token);
+            else if (token.equals(","))
+            {
+                while (opStack.size() > 0)
+                {
+                    if (opStack.peek().equals("("))
+                        break;
+                    output.add(new Token(new Complex(getIndex(token)), Token.INSTRUCTION.OPERATOR));
+                }
+            }
+            else if (isOp(token))
+            {
+                if (token.equals("-") && isUnaryNegative(output, opStack, prev))
+                    opStack.add("neg");
+                else
+                {
+                    while (!opStack.isEmpty())
+                    {
+                        if ((isOp(opStack.peek()) && getPrecedence(opStack.peek()) > getPrecedence(token)) || (isOp(opStack.peek()) && getPrecedence(opStack.peek()) == getPrecedence(token) && token.equals("^") && !opStack.peek().equals("(")))
+                            output.add(new Token(new Complex(getIndex(opStack.pop())), Token.INSTRUCTION.OPERATOR));
+                        else
+                            break;
+                    }
+                    opStack.add(token);
+                }
+            }
+            else if (token.equals("(") || token.equals("{") || token.equals("[")) //Left bracket
+            {
+                opStack.add("(");
+            }
+            else if (token.equals(")")|| token.equals("}") || token.equals("]")) //Right bracket
+            {
+                while (!opStack.isEmpty())
+                {
+                    if (!opStack.peek().equals("("))
+                        output.add(new Token(new Complex(getIndex(opStack.pop())), Token.INSTRUCTION.OPERATOR));
+                    else
+                        break;
+                }
+
+                if (opStack.isEmpty()) //If there is no matching parenthesis, error
+                    System.err.println("MISMATCHED PARENTHESIS");
+
+                opStack.pop();
+
+                if (opStack.isEmpty()) //There are no more items on the stack, c'est fini
+                    return;
+                if (isFunction(opStack.peek()) || isOp(opStack.peek()))
+                        output.add(new Token(new Complex(getIndex(opStack.pop())), Token.INSTRUCTION.OPERATOR));
+            }
+            else
+                System.err.println("UNRECOSNISED TOKEN: '" + token + "'");
+        }
+    }
+    
+    /**
+     * Converts a string to a list of tokens. Takes a string, separates each token and processes them individually. 
+     * @param str the string to process
+     * @return the formula as a token list
+     */
+    private static Token[] processString(String str)
+    {
+        Vector<Token> output = new Vector<Token>();
+        Stack<String> opStack = new Stack<String>();
+        Token[] ans;
+        
+        String buff = "";
+        String prev = "";
+        
+        str.toLowerCase();
+        
+        str = removeWhitespace(str);
+        
+        for (int i = 0; i < str.length(); ++i)
+        {
+            char ch = str.charAt(i);
+            if (isLetter(ch) || isNum(ch) || ch == '.' || (ch == 'e' && isNum(str.charAt(i-1))) || (ch == '+' || ch == '-') && str.charAt(i-1) == 'e')
+            {
+                buff += ch;
+            }
+            else
+            {
+                sendToken(output, opStack, buff, prev);
+                if (!buff.isEmpty())
+                    prev = buff;
+                sendToken(output, opStack, new String(new char[] {ch} ), prev);
+                prev = new String(new char[] {ch} );
+                buff = "";
+            }
+        }
+        sendToken(output, opStack, buff, prev);
+        if (!buff.isEmpty())
+            prev = buff;
+
+        while (!opStack.isEmpty())
+        {
+            String item = opStack.pop();
+            if (!item.equals("("))
+                    output.add(new Token(new Complex(getIndex(item)), Token.INSTRUCTION.OPERATOR));
+            else 
+                System.err.println("Right hand brace missing");
+        }
+        
+        if (!verify(output))
+            System.err.println("Too many/few values left on stack");
+        
+        for (int i = 0; i < output.size(); ++i)
+            System.out.println("Token " + i + ": " + output.elementAt(i).toString());
+        
+        ans = new Token[output.size()];
+        ans = (Token[])output.toArray(ans);
+        return ans;
+    }
+    
+    /**
+     * Performs a quick run of the equation, and returns true if a single element
+     * remains on the virtual stack, else returns false
+     * @param output the tokenlist to test
+     * @return true if the tokenlist is correct, otherwise false
+     */
+    private static boolean verify(Vector<Token> output)
+    {
+        int pretend_stack_size = 0;
+        for (int i = 0; i < output.size(); ++i)
+        {
+            if (output.elementAt(i).getType() == Token.INSTRUCTION.CONSTANT || output.elementAt(i).getType() == Token.INSTRUCTION.VARIABLE) //If its z or constant we push (so add 1)
+                ++pretend_stack_size;
+            else if (output.elementAt(i).getType() == Token.INSTRUCTION.OPERATOR && output.elementAt(i).getData().getReal() < 6) //If its binary operator we pop 2 and push 1 (so decrement 1)
+                --pretend_stack_size;
+        }
+        return (pretend_stack_size == 1);
+    }
+    
+    /**
+     * Set the _stackmax member variable by iterating through the tokenlist performing
+     * a mock run. MUST be called when _tokenlist changes.
+     */
+    private void calculateStackmax()
+    {
+        _stackmax = 0;
+        int ptr = 0;
+        for (int i = 0; i < _tokenlist.length; ++i)
+        {
+            if (_tokenlist[i].getType() == Token.INSTRUCTION.CONSTANT || _tokenlist[i].getType() == Token.INSTRUCTION.VARIABLE)
+                ++ptr;
+            else if (_tokenlist[i].getType() == Token.INSTRUCTION.OPERATOR && _tokenlist[i].getData().getReal() < 6)
+                --ptr;
+            _stackmax = (ptr > _stackmax) ? ptr : _stackmax;
+        }
+        
+    }
 }

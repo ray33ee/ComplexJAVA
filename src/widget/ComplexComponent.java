@@ -28,16 +28,29 @@ import complex.Evaluator;
  */
 public class ComplexComponent extends JComponent {
     
-    private final int REALS_PER_COMPLEX = 2; //The number of real numbers per complex number. SInce this is always one real component and one imaginary component, this is always 2
+    /**
+     * The number of real numbers per complex number. Since this is always one real component and one imaginary component, this is always 2
+     */
+    private final int REALS_PER_COMPLEX = 2;
     
+    /**
+     * Represents the 'minimum' corner of the domain to show.
+     */
     private Complex     _min;
+    
+    /**
+     * Represents the 'maximum' corner of the domain to show.
+     */
     private Complex     _max;
-    private Token[]     _tokens;
-    private int         _stackmax;
+    
     private CLContext   _context;
     private CLKernel    _kernel;
     private CLQueue     _queue;
     
+    /**
+     * Evaluator variable is responsible for calculating f(z) for trace and newton-raphson functions, and converts 
+     * the formula string into a token list;
+     */
     private Evaluator _evaltor;
     
     /**
@@ -51,12 +64,12 @@ public class ComplexComponent extends JComponent {
         _min = min;
         _max = max;
         _context = JavaCL.createBestContext(CLPlatform.DeviceFeature.DoubleSupport);
+        _evaltor = new Evaluator();
         
-        
-        _tokens = new Token[] { new Token(new Complex(0, 0), Token.INSTRUCTION.VARIABLE) ,
+        /*_tokens = new Token[] { new Token(new Complex(0, 0), Token.INSTRUCTION.VARIABLE) ,
                                 new Token(new Complex(2, 0), Token.INSTRUCTION.CONSTANT) ,
                                 new Token(new Complex(4, 0), Token.INSTRUCTION.OPERATOR) };
-        _stackmax = 3;
+        _stackmax = 3;*/
         
         System.out.println("Local memory size: " + _context.getDevices()[0].getLocalMemSize());
         
@@ -148,15 +161,18 @@ public class ComplexComponent extends JComponent {
         BufferedImage bufferedImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         int[] imagePixelData = ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
         
+        //Get a copy of the token list
+        Token[] list = _evaltor.getTokens();
+        
         //Token list is implemented as a list of floats. Each group of three floats represents real, imaginary and type of a token
-        Pointer<Float> tokenPtr = allocateFloats(_tokens.length * 3); //.order(_context.getByteOrder());
+        Pointer<Float> tokenPtr = allocateFloats(list.length * 3); //.order(_context.getByteOrder());
         
         //Copy tokens
-        for (int i = 0; i < _tokens.length; ++i)
+        for (int i = 0; i < list.length; ++i)
         {
-            tokenPtr.set(3*i, (float)_tokens[i].getData().getReal());
-            tokenPtr.set(3*i+1, (float)_tokens[i].getData().getImaginary());
-            tokenPtr.set(3*i+2, (float)_tokens[i].getInt());
+            tokenPtr.set(3*i, (float)list[i].getData().getReal());
+            tokenPtr.set(3*i+1, (float)list[i].getData().getImaginary());
+            tokenPtr.set(3*i+2, (float)list[i].getInt());
         }
         
         //Create input buffer for token list
@@ -168,19 +184,19 @@ public class ComplexComponent extends JComponent {
         //Create a stack of floats or doubles, depending on support
         CLBuffer stackbuff;
         if (_context.isDoubleSupported())
-            stackbuff = _context.createDoubleBuffer(CLMem.Usage.Output, getArea() * _stackmax * REALS_PER_COMPLEX);
+            stackbuff = _context.createDoubleBuffer(CLMem.Usage.Output, getArea() * _evaltor.getStackMax() * REALS_PER_COMPLEX);
         else
-            stackbuff = _context.createFloatBuffer(CLMem.Usage.Output, getArea() * _stackmax * REALS_PER_COMPLEX);
+            stackbuff = _context.createFloatBuffer(CLMem.Usage.Output, getArea() * _evaltor.getStackMax() * REALS_PER_COMPLEX);
         
         // Get and call the kernel :
         _kernel.setArgs(
                 tokenBuff, stackbuff,
-                _tokens.length,
+                list.length,
                 (float)_min.getReal(), 
                 (float)_min.getImaginary(), 
                 (float)(_max.getReal() - _min.getReal()), 
                 (float)(_max.getImaginary() - _min.getImaginary()),
-                getWidth(), getHeight(), outbuff, getArea(), _stackmax);
+                getWidth(), getHeight(), outbuff, getArea(), _evaltor.getStackMax());
         
         int[] globalSizes = new int[] { getWidth(), getHeight() };
         

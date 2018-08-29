@@ -1,3 +1,7 @@
+Version 1.1.5
+    - Evaluator setString now complete, converts string formula into tokenlist
+    - Javadoc updated on all classes (Javadocs now supplied for member variables)
+
 Version 1.1.4
     - Fixed crashing GPU bug
     - Host code now creates float or double buffer depending on double precision support
@@ -8,8 +12,8 @@ Version 1.1.3
 
 Version 1.1.2
     - Move project cleaning
-    - Added Evaulator and Token classes back (for trace anad newton raphson
-    - Local memory implemented for staack, calculatins moved from kernel to evaulator function
+    - Added Evaulator and Token classes back (for trace and newton raphson
+    - Local memory implemented for stack, calculations moved from kernel to evaulator function
 
 
 Version 1.1.1
