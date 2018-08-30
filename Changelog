@@ -1,3 +1,7 @@
+Version 1.1.6
+    - Main JFrame now implemented via MainFrame class.
+    - Various wawrnings and issues fixed
+
 Version 1.1.5
     - Evaluator setString now complete, converts string formula into tokenlist
     - Javadoc updated on all classes (Javadocs now supplied for member variables)

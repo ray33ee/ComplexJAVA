@@ -20,6 +20,23 @@ import org.apache.commons.math3.complex.Complex;
 public class Evaluator {
     
     /**
+     * Machine EPSILON value
+     */
+    private static final double EPSILON;
+    
+    /**
+     * Square root of machine EPSILON value
+     */
+    private static final double SQRTEPS;
+    
+    static { double ep = 1; while (1.0 + 0.5*ep != 1.0) ep = 0.5 * ep; EPSILON = ep; SQRTEPS = Math.sqrt(EPSILON); }
+    
+    /**
+     * Default timeout value supplied to the newton-raphson method
+     */
+    public static final int TIMEOUT = 1000;
+    
+    /**
      * List of all functions (excludes operators)
      */
     private static final String[] functions = { "log", "neg", "conj", "sqrt", "ln", "exp", "sinh", "cosh", "tanh", "sin", "cos", "tan", "asinh", "acosh", "atanh", "asin", "acos", "atan", "inv", "mod", "arg" };
@@ -32,53 +49,37 @@ public class Evaluator {
     /**
      * The maximum size the stack can grow to when evaluating tokenlist
      */
-    private int     _stackmax;
+    private int _stackmax;
     
     /**
      * Constructs an instance of Evaulator, with the formula "z".
      */
-    public Evaluator()
-    {
-        setString("z");
-    }
+    public Evaluator() { setString("(z + i)*(z-1)"); }
     
     /**
      * Constructs an instance of Evaulator with a specific formula
      * @param formula the equation to convert
      */
-    public Evaluator(String formula)
-    {
-        setString(formula);
-    }
+    public Evaluator(String formula) { setString(formula); }
     
     /**
      * Obtains a copy (via clone) of the list of tokens
      * @return a copy of the array of tokens stored
      */
-    public Token[] getTokens()
-    {
-        return _tokenlist.clone();
-    }
+    public Token[] getTokens() { return _tokenlist.clone(); }
     
     /**
      * Get the maximum size of the stack required for a single evaluation of the formula.
      * @return the maximum size that an evaluating stack can grow to
      */
-    public int getStackMax()
-    {
-        return _stackmax;
-    }
+    public int getStackMax() { return _stackmax; }
     
     /**
      * Convert string formula into token list, and use the token list to get the
      * max stack size. 
      * @param formula the formula to convert
      */
-    public void setString(String formula)
-    {
-        _tokenlist = processString(formula);
-        calculateStackmax();
-    }
+    public void setString(String formula) { _tokenlist = processString(formula); calculateStackmax(); }
     
     /**
      * Use the formula from the token list to calculate the expression f(z)
@@ -199,15 +200,26 @@ public class Evaluator {
         return stack[pointer-1];
     }
     
-    private static boolean isNum(char ch)
+    
+    public Complex newton_raphson(Complex zn, int timeout)
     {
-        return ch >= '0' && ch <= '9';
+        //Timeout for non-convergent cases
+	if (timeout-- == 0)
+		return zn;
+
+	Complex next = zn.subtract(f(zn).divide(fast_gradient(zn)));
+
+	if ((next.subtract(zn)).abs() < EPSILON)
+		return next;
+
+	return newton_raphson(next, timeout);
     }
     
-    private static boolean isLetter(char ch)
-    {
-        return ch >= 'a' && ch <= 'z';
-    }
+    private Complex fast_gradient(Complex z) { Complex h = z.multiply(SQRTEPS); return (f(z.add(h)).subtract(f(z))).divide(h); }
+    
+    private static boolean isNum(char ch) { return ch >= '0' && ch <= '9'; }
+    
+    private static boolean isLetter(char ch) { return ch >= 'a' && ch <= 'z'; }
     
     /**
      * Determines whether the string can be converted to a valid number
@@ -232,10 +244,7 @@ public class Evaluator {
      * @param str the string to test
      * @return true if str is one of the following - +, -, *, /, ^ or neg (unary negate)
      */
-    private static boolean isOp(String str)
-    {
-        return str.equals("+") || str.equals("-") || str.equals("*") || str.equals("/") || str.equals("^") || str.equals("neg" );
-    }
+    private static boolean isOp(String str) { return str.equals("+") || str.equals("-") || str.equals("*") || str.equals("/") || str.equals("^") || str.equals("neg" ); }
     
     /**
      * Determines whether the string is a function
@@ -257,14 +266,18 @@ public class Evaluator {
      */
     private static int getPrecedence(String token)
     {
-        if (token.equals("+") || token.equals("-"))
-            return 1;
-        else if (token.equals("*") || token.equals("/"))
-            return 2;
-        else if (token.equals("neg"))
-            return 3;
-        else //if (token == "^")
-            return 4;
+        switch (token) {
+            case "+":
+            case "-":
+                return 1;
+            case "*":
+            case "/":
+                return 2;
+            case "neg":
+                return 3;
+            default:
+                return 4;
+        }
     }
     
     /**
@@ -277,16 +290,20 @@ public class Evaluator {
     {
         if (isOp(str) && !str.equals("neg"))
         {
-            if (str.equals("+"))
-                return 0;
-            else if (str.equals("-"))
-                return 1;
-            else if (str.equals("*"))
-                return 2;
-            else if (str.equals("/"))
-                return 3;
-            else if (str.equals("^"))
-                return 4;
+            switch (str) {
+                case "+":
+                    return 0;
+                case "-":
+                    return 1;
+                case "*":
+                    return 2;
+                case "/":
+                    return 3;
+                case "^":
+                    return 4;
+                default:
+                    break;
+            }
         }
         else
         {
@@ -304,10 +321,7 @@ public class Evaluator {
      * @param token
      * @return 
      */
-    private static boolean isUnaryNegative(Vector<Token> output, Stack<String> opStack, String prevToken)
-    {
-        return (output.size()== 0 && opStack.size() == 0) || prevToken.equals("(") || prevToken.equals("neg") || isOp(prevToken);
-    }
+    private static boolean isUnaryNegative(Vector<Token> output, Stack<String> opStack, String prevToken) { return (output.isEmpty() && opStack.isEmpty()) || prevToken.equals("(") || prevToken.equals("neg") || isOp(prevToken); }
     
     /**
      * Removes all whitespace from the string
@@ -333,7 +347,7 @@ public class Evaluator {
      */
     private static void sendToken(Vector<Token> output, Stack<String> opStack, String token, String prev)
     {
-        if (token != "")
+        if (!token.isEmpty())
         {
             if (token.equals("z"))
                 output.add(new Token(new Complex(0), Token.INSTRUCTION.VARIABLE));
@@ -437,8 +451,6 @@ public class Evaluator {
             }
         }
         sendToken(output, opStack, buff, prev);
-        if (!buff.isEmpty())
-            prev = buff;
 
         while (!opStack.isEmpty())
         {

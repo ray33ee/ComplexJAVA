@@ -10,29 +10,24 @@
  */
 package complexjava;
 
-import javax.swing.JFrame;
-import widget.ComplexComponent;
-import org.apache.commons.math3.complex.Complex;
+import widget.MainFrame;
+import widget.PropertyDialog;
 
 /**
  *
  * @author Will
  */
-public class ComplexJAVA  {
+public class ComplexJAVA  
+{
 
    /**
      * @param args the command line arguments
      */
-   public static void main(String[] args) {
-        ComplexComponent pan = new ComplexComponent(new Complex(-10,-10), new Complex(10,10));
-        JFrame frame = new JFrame();
+   public static void main(String[] args) 
+   {
+        MainFrame frame = new MainFrame();
         
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1800, 1000);
-        frame.setVisible(true);
-        
-        frame.getContentPane().add(pan);
-      
+        PropertyDialog d = new PropertyDialog(frame);
    }
     
 }

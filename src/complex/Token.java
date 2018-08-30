@@ -117,15 +117,18 @@ public class Token extends Object {
      * Convert token to string format
      * @return token as a string
      */
+    @Override
     public String toString()
     {
-        if (_type == INSTRUCTION.VARIABLE)
-            return "z";
-        else if (_type == INSTRUCTION.CONSTANT)
-            return _data.toString();
-        else if (_type == INSTRUCTION.OPERATOR)
-            return functions[(int)_data.getReal()];
-        else
-            return "NULL";
+        switch (_type) {
+            case VARIABLE:
+                return "z";
+            case CONSTANT:
+                return _data.toString();
+            case OPERATOR:
+                return functions[(int)_data.getReal()];
+            default:
+                return "NULL";
+        }
     }
 }

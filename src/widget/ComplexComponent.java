@@ -66,15 +66,6 @@ public class ComplexComponent extends JComponent {
         _context = JavaCL.createBestContext(CLPlatform.DeviceFeature.DoubleSupport);
         _evaltor = new Evaluator();
         
-        /*_tokens = new Token[] { new Token(new Complex(0, 0), Token.INSTRUCTION.VARIABLE) ,
-                                new Token(new Complex(2, 0), Token.INSTRUCTION.CONSTANT) ,
-                                new Token(new Complex(4, 0), Token.INSTRUCTION.OPERATOR) };
-        _stackmax = 3;*/
-        
-        System.out.println("Local memory size: " + _context.getDevices()[0].getLocalMemSize());
-        
-        
-                
         for (int i = 0; i < JavaCL.listPlatforms().length; ++i)
         {
             System.out.println("Platform: " + i + " is " + JavaCL.listPlatforms()[i].getName());
@@ -102,53 +93,25 @@ public class ComplexComponent extends JComponent {
     }
     
     /**
-     * Gets the width of the image, in pixels
-     * 
-     * @return the width of the image
+     * Get the area of the image, in pixels.
+     * @return the area, getWidth() * getHeight()
      */
-    public int getWidth()
-    {
-        return super.getWidth() - 10;
-    }
-    
-    /**
-     * Gets the height of the image, in pixels
-     * 
-     * @return the height of the image
-     */
-    public int getHeight()
-    {
-        return super.getHeight() - 10 ;
-    }
-    
-    public int getArea()
-    {
-        return getWidth() * getHeight();
-    }
+    public int getArea() { return getWidth() * getHeight(); }
     
     /**
      * Gets the minimum domain of the complex landscape (lower left coordinate)
      * @return the lower left position of the domain
      */
-    public Complex getMin()
-    {
-        return _min;
-    }
+    public Complex getMin() { return _min; }
     
     /**
      * Gets the maximum domain of the complex landscape (upper right coordinate)
      * @return the upper right position of the domain
      */
-    public Complex getMax()
-    {
-        return _max;
-    }
+    public Complex getMax() { return _max; }
     
-    public void paint(Graphics g) 
-    {
-        Image img = drawImage();
-        g.drawImage(img, 10, 10,this);
-    }
+    @Override
+    public void paint(Graphics g) { Image img = drawImage(); g.drawImage(img, 0, 0,this); }
 
     /**
      * Construct an image of the landscape. 
@@ -156,7 +119,6 @@ public class ComplexComponent extends JComponent {
      */
     private Image drawImage()
     {
-        
         //Get a reference to the underlying image pixel data
         BufferedImage bufferedImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         int[] imagePixelData = ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
