@@ -1,3 +1,14 @@
+Version 1.1.8
+    - Whitespace is ignored
+    - Leading '-' issue resolved
+    - Add mouse listener events to ComplexComponent class
+    - Evaluator parser exceptions implemented, said exceptions caught in dialog
+
+Version 1.1.7
+    - ComplexColor renamed to Complex lib with toString function added
+    - Landscape class (encapsulating min, max and evaltor fields) created
+    - Landscape class used in ComplexComponent, MainFrame and PropertyDialog.
+
 Version 1.1.6
     - Main JFrame now implemented via MainFrame class.
     - Various wawrnings and issues fixed

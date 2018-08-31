@@ -3,11 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package complex;
+package complex.evaluator;
 
+import complex.Complex;
+import complex.Token;
 import java.util.Stack;
 import java.util.Vector;
-import org.apache.commons.math3.complex.Complex;
+//import org.apache.commons.math3.complex.Complex;
+
+import complex.evaluator.exceptions.*;
 
 /**
  *  This Evaluator class acts as a functor for calculating f(z). This class is initialised
@@ -51,16 +55,18 @@ public class Evaluator {
      */
     private int _stackmax;
     
+    private String _equation;
+    
     /**
      * Constructs an instance of Evaulator, with the formula "z".
      */
-    public Evaluator() { setString("(z + i)*(z-1)"); }
+    public Evaluator() {  try {setString("z");} catch (EvaluatorParseException e) {}; }
     
     /**
      * Constructs an instance of Evaulator with a specific formula
      * @param formula the equation to convert
      */
-    public Evaluator(String formula) { setString(formula); }
+    public Evaluator(String formula) throws InvalidTokenException, MissingLeftBracketException, MissingRightBracketException, InvalidOperatorUseException { setString(formula); }
     
     /**
      * Obtains a copy (via clone) of the list of tokens
@@ -75,11 +81,17 @@ public class Evaluator {
     public int getStackMax() { return _stackmax; }
     
     /**
+     * Get the string representation of the token list, that is, the original formula used.
+     * @return the equation as a string
+     */
+    public String getEquation() { return _equation; }
+    
+    /**
      * Convert string formula into token list, and use the token list to get the
      * max stack size. 
      * @param formula the formula to convert
      */
-    public void setString(String formula) { _tokenlist = processString(formula); calculateStackmax(); }
+    public void setString(String formula) throws InvalidTokenException, MissingLeftBracketException, MissingRightBracketException, InvalidOperatorUseException { _tokenlist = processString(formula); calculateStackmax(); _equation = formula; }
     
     /**
      * Use the formula from the token list to calculate the expression f(z)
@@ -128,7 +140,7 @@ public class Evaluator {
                             break;
                         case 5:
                             --pointer;
-                            stack[pointer-1] = stack[pointer-1].log().divide(stack[pointer].log());
+                            stack[pointer-1] = stack[pointer-1].log(stack[pointer]);
                             break;
                         case 6:
                             stack[pointer-1] = stack[pointer-1].negate();
@@ -140,7 +152,7 @@ public class Evaluator {
                             stack[pointer-1] = stack[pointer-1].sqrt();
                             break;
                         case 9:
-                            stack[pointer-1] = stack[pointer-1].log();
+                            stack[pointer-1] = stack[pointer-1].ln();
                             break;
                         case 10:
                             stack[pointer-1] = stack[pointer-1].exp();
@@ -215,7 +227,10 @@ public class Evaluator {
 	return newton_raphson(next, timeout);
     }
     
-    private Complex fast_gradient(Complex z) { Complex h = z.multiply(SQRTEPS); return (f(z.add(h)).subtract(f(z))).divide(h); }
+    private Complex fast_gradient(Complex z) { 
+        Complex h = z.multiply(SQRTEPS); 
+        return (f(z.add(h)).subtract(f(z))).divide(h); 
+    }
     
     private static boolean isNum(char ch) { return ch >= '0' && ch <= '9'; }
     
@@ -345,7 +360,7 @@ public class Evaluator {
      * @param opStack the stack of operators
      * @param token the token to push
      */
-    private static void sendToken(Vector<Token> output, Stack<String> opStack, String token, String prev)
+    private static void sendToken(Vector<Token> output, Stack<String> opStack, String token, String prev) throws InvalidTokenException, MissingLeftBracketException
     {
         if (!token.isEmpty())
         {
@@ -401,7 +416,7 @@ public class Evaluator {
                 }
 
                 if (opStack.isEmpty()) //If there is no matching parenthesis, error
-                    System.err.println("MISMATCHED PARENTHESIS");
+                    throw new MissingLeftBracketException();
 
                 opStack.pop();
 
@@ -411,7 +426,7 @@ public class Evaluator {
                         output.add(new Token(new Complex(getIndex(opStack.pop())), Token.INSTRUCTION.OPERATOR));
             }
             else
-                System.err.println("UNRECOSNISED TOKEN: '" + token + "'");
+                throw new InvalidTokenException(token); //System.err.println("UNRECOSNISED TOKEN: '" + token + "'");
         }
     }
     
@@ -420,7 +435,7 @@ public class Evaluator {
      * @param str the string to process
      * @return the formula as a token list
      */
-    private static Token[] processString(String str)
+    private static Token[] processString(String str) throws InvalidTokenException, MissingLeftBracketException, MissingRightBracketException, InvalidOperatorUseException
     {
         Vector<Token> output = new Vector<Token>();
         Stack<String> opStack = new Stack<String>();
@@ -436,7 +451,22 @@ public class Evaluator {
         for (int i = 0; i < str.length(); ++i)
         {
             char ch = str.charAt(i);
-            if (isLetter(ch) || isNum(ch) || ch == '.' || (ch == 'e' && isNum(str.charAt(i-1))) || (ch == '+' || ch == '-') && str.charAt(i-1) == 'e')
+            
+            if (i == 0)
+            {
+                if (ch == '-')
+                    sendToken(output, opStack, new String(new char[] {ch} ), prev);
+                else
+                    buff += ch;
+                
+                continue;
+            }
+            
+            if (isLetter(ch) || 
+                    isNum(ch) || 
+                    ch == '.' || 
+                    (ch == 'e' && isNum(str.charAt(i-1))) || 
+                    (ch == '+' || ch == '-') && str.charAt(i-1) == 'e')
             {
                 buff += ch;
             }
@@ -458,14 +488,16 @@ public class Evaluator {
             if (!item.equals("("))
                     output.add(new Token(new Complex(getIndex(item)), Token.INSTRUCTION.OPERATOR));
             else 
-                System.err.println("Right hand brace missing");
+                throw new MissingRightBracketException();
         }
         
         if (!verify(output))
-            System.err.println("Too many/few values left on stack");
+            throw new InvalidOperatorUseException("FIND OFFENDING OPERATOR");
+        
+        System.out.println("Formula: " + str);
         
         for (int i = 0; i < output.size(); ++i)
-            System.out.println("Token " + i + ": " + output.elementAt(i).toString());
+            System.out.println("    Token " + i + ": " + output.elementAt(i).toString());
         
         ans = new Token[output.size()];
         ans = (Token[])output.toArray(ans);

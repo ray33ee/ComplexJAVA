@@ -5,10 +5,10 @@
  */
 package complex;
 
-import org.apache.commons.math3.complex.Complex;
+//import org.apache.commons.math3.complex.Complex;
 
 /**
- *  Token class, represents an individual token. This token can either be the independenet variable, a constant or a function/operator. 
+ *  Token class, represents an individual token. This token can either be the independent variable, a constant or a function/operator. 
  *  It contains _data and _type, which explains how _data should be treated.
  * @author Will
  */

@@ -3,4 +3,5 @@
 - Update domain colouring algorithm in ComplexColor.Java to match OpenCL kernel domain colouring
 - Add asinh, acosh and atanh functions to Evaluator.f(Complex) function)
 - Investigate "(z + i)*(z-1)" issue
-- make sure whitespace is ignored
+- find offending operator when throwing InvalidOperatorUseException exception
+- Catch EvaluatorParseException exceptions in dialog 

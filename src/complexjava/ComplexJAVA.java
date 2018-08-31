@@ -11,7 +11,6 @@
 package complexjava;
 
 import widget.MainFrame;
-import widget.PropertyDialog;
 
 /**
  *
@@ -27,7 +26,7 @@ public class ComplexJAVA
    {
         MainFrame frame = new MainFrame();
         
-        PropertyDialog d = new PropertyDialog(frame);
+        
    }
     
 }

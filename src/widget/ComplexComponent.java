@@ -11,8 +11,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import javax.swing.JComponent;
 
-import org.apache.commons.math3.complex.Complex;
-
 import com.nativelibs4java.opencl.*;
 import com.nativelibs4java.util.*;
 import org.bridj.Pointer;
@@ -20,59 +18,58 @@ import static org.bridj.Pointer.*;
 import java.io.IOException;
 
 import complex.Token;
-import complex.Evaluator;
+import complex.Landscape;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 /**
  *  ComplexComponent is a widget responsible for painting complex landscapes
  * @author Will
  */
-public class ComplexComponent extends JComponent {
+public class ComplexComponent extends JComponent implements MouseMotionListener, MouseListener  {
+    
+    enum ActionType { PAN, ZOOM, NEWTON };
     
     /**
      * The number of real numbers per complex number. Since this is always one real component and one imaginary component, this is always 2
      */
     private final int REALS_PER_COMPLEX = 2;
     
-    /**
-     * Represents the 'minimum' corner of the domain to show.
-     */
-    private Complex     _min;
-    
-    /**
-     * Represents the 'maximum' corner of the domain to show.
-     */
-    private Complex     _max;
-    
     private CLContext   _context;
     private CLKernel    _kernel;
     private CLQueue     _queue;
     
     /**
-     * Evaluator variable is responsible for calculating f(z) for trace and newton-raphson functions, and converts 
-     * the formula string into a token list;
+     * Contains the variables needed to draw a complex landscape. See Landscape class.
      */
-    private Evaluator _evaltor;
+    private Landscape _landscape;
+    
+    /**
+     * Defines which action to user interacts with component
+     */
+    private ActionType _action;
     
     /**
      * Construct Complex component and initialise JComponent and member variables.
-     * @param min   the lower left position of the domain
-     * @param max   the upper right position of the domain
+     * @param land the initial landscape to draw
      */
-    public ComplexComponent(Complex min, Complex max)
+    public ComplexComponent(Landscape land)
     {
         super();
-        _min = min;
-        _max = max;
         _context = JavaCL.createBestContext(CLPlatform.DeviceFeature.DoubleSupport);
-        _evaltor = new Evaluator();
         
+        _landscape = new Landscape(land.getEvaluator(), land.getMinDomain(), land.getMaxDomain());
+        
+        _action = ActionType.PAN; 
+       
         for (int i = 0; i < JavaCL.listPlatforms().length; ++i)
         {
             System.out.println("Platform: " + i + " is " + JavaCL.listPlatforms()[i].getName());
             for (int j = 0; j < JavaCL.listPlatforms()[i].listAllDevices(true).length; ++j)
                 System.out.println("    Device: " + j + " " + JavaCL.listPlatforms()[i].listAllDevices(true)[j].getName());
         }
-                
+        
         try
         {
             _queue = _context.createDefaultQueue();
@@ -83,13 +80,14 @@ public class ComplexComponent extends JComponent {
             
             for (int i = 0; i < _context.getDevices().length; ++i)
                 System.out.println("Using Device " + i + " " + _context.getDevices()[i].getName());
-            
-            //_outbuff = _context.createIntBuffer(CLMem.Usage.Output, getWidth() * getHeight());
         }
         catch (IOException e)
         {
             
-        }
+        }       
+        
+        addMouseMotionListener(this);
+        addMouseListener(this);
     }
     
     /**
@@ -98,17 +96,27 @@ public class ComplexComponent extends JComponent {
      */
     public int getArea() { return getWidth() * getHeight(); }
     
-    /**
-     * Gets the minimum domain of the complex landscape (lower left coordinate)
-     * @return the lower left position of the domain
-     */
-    public Complex getMin() { return _min; }
+    public Landscape getLandscape() { return _landscape; }
     
-    /**
-     * Gets the maximum domain of the complex landscape (upper right coordinate)
-     * @return the upper right position of the domain
-     */
-    public Complex getMax() { return _max; }
+    public void setLandscape(Landscape land) { _landscape = land; }
+    
+    @Override
+    public void mouseMoved(MouseEvent e)
+    {
+        System.out.println("MOVE: " + e.toString());
+    }
+    
+    @Override
+    public void mousePressed(MouseEvent e) 
+    {
+        System.out.println("DOWN");
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) 
+    {
+        System.out.println("UP");
+    }
     
     @Override
     public void paint(Graphics g) { Image img = drawImage(); g.drawImage(img, 0, 0,this); }
@@ -124,7 +132,7 @@ public class ComplexComponent extends JComponent {
         int[] imagePixelData = ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
         
         //Get a copy of the token list
-        Token[] list = _evaltor.getTokens();
+        Token[] list = _landscape.getEvaluator().getTokens();
         
         //Token list is implemented as a list of floats. Each group of three floats represents real, imaginary and type of a token
         Pointer<Float> tokenPtr = allocateFloats(list.length * 3); //.order(_context.getByteOrder());
@@ -146,19 +154,19 @@ public class ComplexComponent extends JComponent {
         //Create a stack of floats or doubles, depending on support
         CLBuffer stackbuff;
         if (_context.isDoubleSupported())
-            stackbuff = _context.createDoubleBuffer(CLMem.Usage.Output, getArea() * _evaltor.getStackMax() * REALS_PER_COMPLEX);
+            stackbuff = _context.createDoubleBuffer(CLMem.Usage.Output, getArea() * _landscape.getEvaluator().getStackMax() * REALS_PER_COMPLEX);
         else
-            stackbuff = _context.createFloatBuffer(CLMem.Usage.Output, getArea() * _evaltor.getStackMax() * REALS_PER_COMPLEX);
+            stackbuff = _context.createFloatBuffer(CLMem.Usage.Output, getArea() * _landscape.getEvaluator().getStackMax() * REALS_PER_COMPLEX);
         
         // Get and call the kernel :
         _kernel.setArgs(
                 tokenBuff, stackbuff,
                 list.length,
-                (float)_min.getReal(), 
-                (float)_min.getImaginary(), 
-                (float)(_max.getReal() - _min.getReal()), 
-                (float)(_max.getImaginary() - _min.getImaginary()),
-                getWidth(), getHeight(), outbuff, getArea(), _evaltor.getStackMax());
+                (float)_landscape.getMinDomain().getReal(), 
+                (float)_landscape.getMinDomain().getImaginary(), 
+                (float)(_landscape.getMaxDomain().getReal() - _landscape.getMinDomain().getReal()), 
+                (float)(_landscape.getMaxDomain().getImaginary() - _landscape.getMinDomain().getImaginary()),
+                getWidth(), getHeight(), outbuff, getArea(), _landscape.getEvaluator().getStackMax());
         
         int[] globalSizes = new int[] { getWidth(), getHeight() };
         
@@ -173,5 +181,13 @@ public class ComplexComponent extends JComponent {
 
         return bufferedImage;
    }
+
+    @Override public void mouseEntered(MouseEvent e) {}
+
+    @Override public void mouseExited(MouseEvent e) {}
+
+    @Override public void mouseClicked(MouseEvent e) {}
+    
+    @Override public void mouseDragged(MouseEvent e) {}
     
 }

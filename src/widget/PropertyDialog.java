@@ -5,22 +5,45 @@
  */
 package widget;
 
+import complex.Landscape;
+import complex.Complex;
+import complex.evaluator.Evaluator;
+import complex.evaluator.exceptions.EvaluatorParseException;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Will
  */
 public class PropertyDialog extends javax.swing.JDialog {
 
+    private Landscape _landscape;
+    
+    private boolean _accepted;
+    
     /**
      * Creates new form propertyDialog
      * @param parent sets parent of dialog
      */
-    public PropertyDialog(java.awt.Frame parent) {
+    public PropertyDialog(java.awt.Frame parent, Landscape land) {
         super(parent, true);
         initComponents();
         
+        _landscape = land;
+        _accepted = false;
+        
+        txtFormula.setText(land.getEvaluator().getEquation());
+        txtMin.setText(land.getMinDomain().toString());
+        txtMax.setText(land.getMaxDomain().toString());
+        
+        setTitle("New Landscape...");
+        
         setVisible(true);
     }
+    
+    public Landscape getLandscape() { return _landscape; }
+    
+    public boolean isAccepted() { return _accepted; }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -31,34 +54,137 @@ public class PropertyDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
+        btnOk = new javax.swing.JButton();
+        btnCancel = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtFormula = new javax.swing.JTextPane();
+        txtMin = new javax.swing.JTextField();
+        txtMax = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jButton1.setText("jButton1");
+        btnOk.setText("Ok");
+        btnOk.setToolTipText("");
+        btnOk.setActionCommand("btnOk");
+        btnOk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOkActionPerformed(evt);
+            }
+        });
+
+        btnCancel.setText("Cancel");
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
+
+        jScrollPane1.setViewportView(txtFormula);
+
+        txtMin.setText("1+i");
+
+        txtMax.setText("-1-i");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(148, 148, 148)
-                .addComponent(jButton1)
-                .addContainerGap(175, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnOk, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnCancel))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGap(16, 16, 16)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtMax, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtMin, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(93, 93, 93)
-                .addComponent(jButton1)
-                .addContainerGap(175, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(txtMin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                .addComponent(txtMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnCancel)
+                    .addComponent(btnOk))
+                .addGap(14, 14, 14))
         );
+
+        btnOk.getAccessibleContext().setAccessibleName("btnOk");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
+        // TODO add your handling code here:
+        
+        Complex min, max;
+        Evaluator convert = new Evaluator();
+        
+        try 
+        {
+            convert.setString(txtMin.getText());
+        }
+        catch (EvaluatorParseException e)
+        {
+            JOptionPane.showMessageDialog(this, "Error in Minimum domain: " + e.getMessage(), "Minimum domain error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        min = convert.f(new Complex(0));
+        
+        try
+        {
+            convert.setString(txtMax.getText());
+        }
+        catch (EvaluatorParseException e)
+        {
+            JOptionPane.showMessageDialog(this, "Error in Maximum domain: " + e.getMessage(), "Maximum domain error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        max = convert.f(new Complex(0));
+        
+        System.out.println("Min: " + min.toString());
+        System.out.println("Max: " + max.toString());
+        
+        try
+        {
+            _landscape = new Landscape(new Evaluator(txtFormula.getText()), min, max);
+        }
+        catch (EvaluatorParseException e)
+        {
+            JOptionPane.showMessageDialog(this, "Error in equation: " + e.getMessage(), "Equation error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        _accepted = true;
+        dispose();
+    }//GEN-LAST:event_btnOkActionPerformed
+
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        // TODO add your handling code here:
+        
+        _accepted = false;
+        dispose();
+    }//GEN-LAST:event_btnCancelActionPerformed
+
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnOk;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextPane txtFormula;
+    private javax.swing.JTextField txtMax;
+    private javax.swing.JTextField txtMin;
     // End of variables declaration//GEN-END:variables
 }
