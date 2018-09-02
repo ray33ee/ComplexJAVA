@@ -6,7 +6,7 @@
 package complex.evaluator.exceptions;
 
 /**
- *
+ * Exception thrown when the Evaluator detects a missing left bracket.
  * @author Will
  */
 public class MissingLeftBracketException extends EvaluatorParseException 

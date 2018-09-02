@@ -6,7 +6,8 @@
 package complex.evaluator.exceptions;
 
 /**
- *
+ * Exception thrown when an operator is not used correctly. The exact cause of this exception
+ * is when there are too many items left on the stack after the initial formula validation.
  * @author Will
  */
 public class InvalidOperatorUseException extends EvaluatorParseException 

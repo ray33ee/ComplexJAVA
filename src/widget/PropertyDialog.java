@@ -12,13 +12,20 @@ import complex.evaluator.exceptions.EvaluatorParseException;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * Dialog prompting user for details of new landscape, that is the equation, minimum domain and maximum domain.
  * @author Will
  */
 public class PropertyDialog extends javax.swing.JDialog {
 
+    /**
+     * The Landscape stored in the dialog. When the dialog is created, the current landscape is 
+     * stored here. When it closes, the landscape selected by the user is moved here.
+     */
     private Landscape _landscape;
     
+    /**
+     * True if the dialog was closed via an accept state (i.e. with ok)
+     */
     private boolean _accepted;
     
     /**
@@ -41,8 +48,16 @@ public class PropertyDialog extends javax.swing.JDialog {
         setVisible(true);
     }
     
+    /**
+     * Returns the landscape stored
+     * @return the landscape
+     */
     public Landscape getLandscape() { return _landscape; }
     
+    /**
+     * Returns true if the dialog was closed via an accept button
+     * @return the accept
+     */
     public boolean isAccepted() { return _accepted; }
 
     /**

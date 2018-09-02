@@ -5,8 +5,6 @@
  */
 package complex;
 
-//import org.apache.commons.math3.complex.Complex;
-
 import complex.evaluator.Evaluator;
 
 
@@ -17,10 +15,27 @@ import complex.evaluator.Evaluator;
  */
 public class Landscape 
 {
+    /**
+     * The evaluator class containing the token list and other information
+     */
     private Evaluator _evaltor;
+    
+    /**
+     * The minimum value in the domain, that is the bottom left of the landscape
+     */
     private Complex _min;
+    
+    /**
+     * The maximum value in the domain, that is the top right of the landscape
+     */
     private Complex _max;
     
+    /**
+     * Constructs a new landscape, with supplied values
+     * @param eval the evaluator (equation) for this class
+     * @param min the minimum domain
+     * @param max the maximum domain
+     */
     public Landscape(Evaluator eval, Complex min, Complex max)
     {
         _evaltor = eval;
@@ -33,4 +48,10 @@ public class Landscape
     public Complex getMinDomain() { return _min; }
     
     public Complex getMaxDomain() { return _max; }
+    
+    @Override
+    public String toString() 
+    {
+        return "(\"" + _evaltor.getEquation() + "\" " + _min.toString() + ", " + _max.toString() + ")";
+    }
 }

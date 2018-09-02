@@ -6,7 +6,7 @@
 package complex.evaluator.exceptions;
 
 /**
- *
+ * Exception thrown when an invalid token is detected.
  * @author Will
  */
 public class InvalidTokenException extends EvaluatorParseException 

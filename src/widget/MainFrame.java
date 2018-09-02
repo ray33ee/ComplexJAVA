@@ -8,32 +8,43 @@ package widget;
 import complex.evaluator.Evaluator;
 import complex.Landscape;
 import complex.Complex;
+import complex.History;
 import java.awt.BorderLayout;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 
 /**
- *
+ * Main frame showing ComplexComponent
  * @author Will
  */
 public class MainFrame extends javax.swing.JFrame {
     
-    private Landscape _landscape;
-    
+    /**
+     * ComplexComponent widget responsible for drawing complex landscapes an handling
+     * mouse events
+     */
     private final ComplexComponent _canvas;
-    private final JToolBar _toolbar;
+    
+    /**
+     * History class responsible for keeping track of undo/redo history
+     */
+    private History<Landscape> _history;
 
     /**
      * Creates new MainFrame form
      */
     public MainFrame() {
         
-        _landscape = new Landscape(new Evaluator(), new Complex(-10,-10), new Complex(10,10));
+        _history = new History();
         
-        _canvas = new ComplexComponent(_landscape);
+        //Add first landscape, using a default Evaluator
+        _history.add(new Landscape(new Evaluator(), new Complex(-10,-10), new Complex(10,10)));
         
-        _toolbar = new JToolBar();
+        //Initialise ComplexComponent with first landscape
+        _canvas = new ComplexComponent(_history.getCurrent());
         
+        //Setup physical attributes for ComplexComponent and frame
+        _canvas.setLayout(new BorderLayout());
         _canvas.setLocation(10, 10);
         
         super.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -43,8 +54,6 @@ public class MainFrame extends javax.swing.JFrame {
         super.setMinimumSize(new java.awt.Dimension (200, 200));
         
         initComponents();
-        
-        _toolbar.setVisible(true);
         
         CanvasPane.add(_canvas);
     }
@@ -71,6 +80,11 @@ public class MainFrame extends javax.swing.JFrame {
         btnSave = new javax.swing.JButton();
         btnPan = new javax.swing.JButton();
         btnZoom = new javax.swing.JButton();
+        btnNewton = new javax.swing.JButton();
+        btnUndo = new javax.swing.JButton();
+        btnRedo = new javax.swing.JButton();
+        btnZoomIn = new javax.swing.JButton();
+        btnZoomOut = new javax.swing.JButton();
         CanvasPane = new javax.swing.JPanel();
         StatusPane = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -79,12 +93,15 @@ public class MainFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        MenuPane.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
         btnNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/new.png"))); // NOI18N
         btnNew.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNewActionPerformed(evt);
             }
         });
+        MenuPane.add(btnNew, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 30, 28));
 
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/save.png"))); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -92,6 +109,7 @@ public class MainFrame extends javax.swing.JFrame {
                 btnSaveActionPerformed(evt);
             }
         });
+        MenuPane.add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(36, 0, 30, 28));
 
         btnPan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/pan.png"))); // NOI18N
         btnPan.addActionListener(new java.awt.event.ActionListener() {
@@ -99,6 +117,7 @@ public class MainFrame extends javax.swing.JFrame {
                 btnPanActionPerformed(evt);
             }
         });
+        MenuPane.add(btnPan, new org.netbeans.lib.awtextra.AbsoluteConstraints(72, 0, 30, 28));
 
         btnZoom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/zoom.png"))); // NOI18N
         btnZoom.addActionListener(new java.awt.event.ActionListener() {
@@ -106,28 +125,47 @@ public class MainFrame extends javax.swing.JFrame {
                 btnZoomActionPerformed(evt);
             }
         });
+        MenuPane.add(btnZoom, new org.netbeans.lib.awtextra.AbsoluteConstraints(108, 0, 30, 28));
 
-        javax.swing.GroupLayout MenuPaneLayout = new javax.swing.GroupLayout(MenuPane);
-        MenuPane.setLayout(MenuPaneLayout);
-        MenuPaneLayout.setHorizontalGroup(
-            MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(MenuPaneLayout.createSequentialGroup()
-                .addComponent(btnNew, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnPan, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnZoom, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-        MenuPaneLayout.setVerticalGroup(
-            MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnNew, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnPan, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnZoom, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-        );
+        btnNewton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/newton.png"))); // NOI18N
+        btnNewton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNewtonActionPerformed(evt);
+            }
+        });
+        MenuPane.add(btnNewton, new org.netbeans.lib.awtextra.AbsoluteConstraints(144, 0, 30, 28));
+
+        btnUndo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/undo.png"))); // NOI18N
+        btnUndo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUndoActionPerformed(evt);
+            }
+        });
+        MenuPane.add(btnUndo, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 0, 30, 28));
+
+        btnRedo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/redo.png"))); // NOI18N
+        btnRedo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRedoActionPerformed(evt);
+            }
+        });
+        MenuPane.add(btnRedo, new org.netbeans.lib.awtextra.AbsoluteConstraints(216, 0, 30, 28));
+
+        btnZoomIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/zoomin.png"))); // NOI18N
+        btnZoomIn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnZoomInActionPerformed(evt);
+            }
+        });
+        MenuPane.add(btnZoomIn, new org.netbeans.lib.awtextra.AbsoluteConstraints(252, 0, 30, 28));
+
+        btnZoomOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/zoomout.png"))); // NOI18N
+        btnZoomOut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnZoomOutActionPerformed(evt);
+            }
+        });
+        MenuPane.add(btnZoomOut, new org.netbeans.lib.awtextra.AbsoluteConstraints(288, 0, 30, 28));
 
         javax.swing.GroupLayout CanvasPaneLayout = new javax.swing.GroupLayout(CanvasPane);
         CanvasPane.setLayout(CanvasPaneLayout);
@@ -163,9 +201,9 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(MenuPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(CanvasPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(StatusPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(MenuPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -180,38 +218,81 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
+    private void btnZoomOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZoomOutActionPerformed
         // TODO add your handling code here:
-        PropertyDialog d = new PropertyDialog(this, _landscape);
-        
-        if (d.isAccepted())
+    }//GEN-LAST:event_btnZoomOutActionPerformed
+
+    private void btnZoomInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZoomInActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnZoomInActionPerformed
+
+    private void btnRedoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRedoActionPerformed
+        // TODO add your handling code here:
+        if (!_history.isAtTop())
         {
-            _landscape = d.getLandscape();
-            _canvas.setLandscape(_landscape);
+            _history.redo();
+            _canvas.setLandscape(_history.getCurrent());
             _canvas.repaint();
         }
-    }//GEN-LAST:event_btnNewActionPerformed
+    }//GEN-LAST:event_btnRedoActionPerformed
+
+    private void btnUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUndoActionPerformed
+        // TODO add your handling code here:
+        System.out.println("Pointer: " + _history.getPointer() + ", Size: " + _history.toArray().length + "Res: " + (!_history.isAtBottom()));
+        if (!_history.isAtBottom())
+        {
+            _history.undo();
+            _canvas.setLandscape(_history.getCurrent());
+            _canvas.repaint();
+        }
+    }//GEN-LAST:event_btnUndoActionPerformed
+
+    private void btnNewtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewtonActionPerformed
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_btnNewtonActionPerformed
+
+    private void btnZoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZoomActionPerformed
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_btnZoomActionPerformed
+
+    private void btnPanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPanActionPerformed
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_btnPanActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnSaveActionPerformed
 
-    private void btnPanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPanActionPerformed
+    private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnPanActionPerformed
+        PropertyDialog d = new PropertyDialog(this, _history.getCurrent());
 
-    private void btnZoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZoomActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnZoomActionPerformed
+        if (d.isAccepted())
+        {
+            _history.add(d.getLandscape());
+            _canvas.setLandscape(_history.getCurrent());
+            _canvas.repaint();
+        }
+
+        System.out.println(_history.toString());
+    }//GEN-LAST:event_btnNewActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel CanvasPane;
     private javax.swing.JPanel MenuPane;
     private javax.swing.JPanel StatusPane;
     private javax.swing.JButton btnNew;
+    private javax.swing.JButton btnNewton;
     private javax.swing.JButton btnPan;
+    private javax.swing.JButton btnRedo;
     private javax.swing.JButton btnSave;
+    private javax.swing.JButton btnUndo;
     private javax.swing.JButton btnZoom;
+    private javax.swing.JButton btnZoomIn;
+    private javax.swing.JButton btnZoomOut;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;

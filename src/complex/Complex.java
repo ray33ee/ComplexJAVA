@@ -8,7 +8,8 @@ package complex;
 import java.awt.Color;
 
 /**
- *
+ * Complex class inherited from org.apache.commons.math3.complex.Complex. Adds 
+ * refined toString() override and color() method.
  * @author Will
  */
 public class Complex extends org.apache.commons.math3.complex.Complex

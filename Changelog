@@ -1,3 +1,8 @@
+Version 1.1.9
+    - History class complete, uses generics instead of object
+    - _landscape variable in MainFrame replaced with _history.getCurrent()
+    - Updated Javadoc
+
 Version 1.1.8
     - Whitespace is ignored
     - Leading '-' issue resolved
@@ -29,7 +34,6 @@ Version 1.1.2
     - Move project cleaning
     - Added Evaulator and Token classes back (for trace and newton raphson
     - Local memory implemented for stack, calculations moved from kernel to evaulator function
-
 
 Version 1.1.1
     - Clean project folder

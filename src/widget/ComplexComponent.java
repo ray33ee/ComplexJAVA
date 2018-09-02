@@ -24,7 +24,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 /**
- *  ComplexComponent is a widget responsible for painting complex landscapes
+ *  ComplexComponent is a widget responsible for painting complex landscapes and handling mouse events
  * @author Will
  */
 public class ComplexComponent extends JComponent implements MouseMotionListener, MouseListener  {
@@ -46,7 +46,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     private Landscape _landscape;
     
     /**
-     * Defines which action to user interacts with component
+     * Stores the action being used. Either Pan, zoom or newton raphson. 
      */
     private ActionType _action;
     
@@ -70,24 +70,29 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
                 System.out.println("    Device: " + j + " " + JavaCL.listPlatforms()[i].listAllDevices(true)[j].getName());
         }
         
+        System.out.println("widget.ComplexComponent.<init>()");
+        
+        _queue = _context.createDefaultQueue();
+        String src = "";
+        
         try
         {
-            _queue = _context.createDefaultQueue();
-            String src = IOUtils.readText(ComplexComponent.class.getResource("/kernel/kernel.cl"));
-            CLProgram program = _context.createProgram(src);
-            program.addInclude("/include/");
-            _kernel = program.createKernel("get_landscape");
-            
-            for (int i = 0; i < _context.getDevices().length; ++i)
-                System.out.println("Using Device " + i + " " + _context.getDevices()[i].getName());
+            src = IOUtils.readText(ComplexComponent.class.getResource("/kernel/kernel.cl"));
         }
         catch (IOException e)
         {
-            
-        }       
+            System.err.println("IOException in widget.ComplexComponent.<init>()" + e.getMessage());
+        }
         
-        addMouseMotionListener(this);
-        addMouseListener(this);
+        CLProgram program = _context.createProgram(src);
+        program.addInclude("/include/");
+        _kernel = program.createKernel("get_landscape");
+
+        for (int i = 0; i < _context.getDevices().length; ++i)
+            System.out.println("Using Device " + i + " " + _context.getDevices()[i].getName());
+            
+        super.addMouseMotionListener(this);
+        super.addMouseListener(this);
     }
     
     /**
@@ -96,14 +101,22 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
      */
     public int getArea() { return getWidth() * getHeight(); }
     
+    /**
+     * Get the current landscape on display
+     * @return _landscape
+     */
     public Landscape getLandscape() { return _landscape; }
     
+    /**
+     * Set the current landscape
+     * @param land the landscape to set to
+     */
     public void setLandscape(Landscape land) { _landscape = land; }
     
     @Override
     public void mouseMoved(MouseEvent e)
     {
-        System.out.println("MOVE: " + e.toString());
+        //System.out.println("MOVE: " + e.toString());
     }
     
     @Override
@@ -158,14 +171,14 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         else
             stackbuff = _context.createFloatBuffer(CLMem.Usage.Output, getArea() * _landscape.getEvaluator().getStackMax() * REALS_PER_COMPLEX);
         
-        // Get and call the kernel :
+        // Get and call the kernel : max.imag and min.imag have been swapped because 0,0 (which is top left) should be bottom 
         _kernel.setArgs(
                 tokenBuff, stackbuff,
                 list.length,
                 (float)_landscape.getMinDomain().getReal(), 
-                (float)_landscape.getMinDomain().getImaginary(), 
+                (float)_landscape.getMaxDomain().getImaginary(), 
                 (float)(_landscape.getMaxDomain().getReal() - _landscape.getMinDomain().getReal()), 
-                (float)(_landscape.getMaxDomain().getImaginary() - _landscape.getMinDomain().getImaginary()),
+                (float)(_landscape.getMinDomain().getImaginary() - _landscape.getMaxDomain().getImaginary()),
                 getWidth(), getHeight(), outbuff, getArea(), _landscape.getEvaluator().getStackMax());
         
         int[] globalSizes = new int[] { getWidth(), getHeight() };

@@ -8,17 +8,16 @@ package complex.evaluator;
 import complex.Complex;
 import complex.Token;
 import java.util.Stack;
-import java.util.Vector;
 //import org.apache.commons.math3.complex.Complex;
 
 import complex.evaluator.exceptions.*;
+import java.util.ArrayList;
 
 /**
- *  This Evaluator class acts as a functor for calculating f(z). This class is initialised
- *  with a formula string, which is processed into an array of tokens. From these tokens, the
- *  minimum stack size is also computed and stored as a member variable. When the calculate
- *  method is invoked, it uses the passed value of z, the token list and the max stack size
- *  to calculate f(z).
+ *  This Evaluator class acts as a functor for calculating f(z), f'(z) and the value of z such that f(z)=0.
+ *  This class is initialised with a formula string, which is processed into an array of tokens. From these 
+ *  tokens, the minimum stack size is also computed and stored as a member variable. When the calculate
+ *  method is invoked, it uses the passed value of z, the token list and the max stack size to calculate f(z).
  * @author Will
  */
 public class Evaluator {
@@ -33,6 +32,9 @@ public class Evaluator {
      */
     private static final double SQRTEPS;
     
+    /**
+     * Calculate the machine epsilon for this precision
+     */
     static { double ep = 1; while (1.0 + 0.5*ep != 1.0) ep = 0.5 * ep; EPSILON = ep; SQRTEPS = Math.sqrt(EPSILON); }
     
     /**
@@ -55,10 +57,14 @@ public class Evaluator {
      */
     private int _stackmax;
     
+    /**
+     * Original string representation of formula. Stored for sake of dialog box which, when created, uses
+     * this string formula in its text box.
+     */
     private String _equation;
     
     /**
-     * Constructs an instance of Evaulator, with the formula "z".
+     * Constructs a default instance of Evaulator, with the formula "z".
      */
     public Evaluator() {  try {setString("z");} catch (EvaluatorParseException e) {}; }
     
@@ -212,8 +218,21 @@ public class Evaluator {
         return stack[pointer-1];
     }
     
+    /**
+     * Performs newton raphson on the current Evaluator equation with the seed value. 
+     * Newton raphson comes with a built in timeout feature for non-convergent cases.
+     * @param z the seed value for newton raphson
+     * @return the most accurate approximation the computer can create
+     */
+    public Complex newton_raphson(Complex z) { return nrm(z, TIMEOUT); }
     
-    public Complex newton_raphson(Complex zn, int timeout)
+    /**
+     * Recursive newton raphson function
+     * @param zn the seed value
+     * @param timeout the current timeout
+     * @return the next approximation
+     */
+    private Complex nrm(Complex zn, int timeout)
     {
         //Timeout for non-convergent cases
 	if (timeout-- == 0)
@@ -224,9 +243,14 @@ public class Evaluator {
 	if ((next.subtract(zn)).abs() < EPSILON)
 		return next;
 
-	return newton_raphson(next, timeout);
+	return nrm(next, timeout);
     }
     
+    /**
+     * Uses the machine epsilon value to create a fast gradient value at a point
+     * @param z the point where the computer will get the gradient
+     * @return the gradient at point z
+     */
     private Complex fast_gradient(Complex z) { 
         Complex h = z.multiply(SQRTEPS); 
         return (f(z.add(h)).subtract(f(z))).divide(h); 
@@ -336,7 +360,7 @@ public class Evaluator {
      * @param token
      * @return 
      */
-    private static boolean isUnaryNegative(Vector<Token> output, Stack<String> opStack, String prevToken) { return (output.isEmpty() && opStack.isEmpty()) || prevToken.equals("(") || prevToken.equals("neg") || isOp(prevToken); }
+    private static boolean isUnaryNegative(ArrayList<Token> output, Stack<String> opStack, String prevToken) { return (output.isEmpty() && opStack.isEmpty()) || prevToken.equals("(") || prevToken.equals("neg") || isOp(prevToken); }
     
     /**
      * Removes all whitespace from the string
@@ -360,7 +384,7 @@ public class Evaluator {
      * @param opStack the stack of operators
      * @param token the token to push
      */
-    private static void sendToken(Vector<Token> output, Stack<String> opStack, String token, String prev) throws InvalidTokenException, MissingLeftBracketException
+    private static void sendToken(ArrayList<Token> output, Stack<String> opStack, String token, String prev) throws InvalidTokenException, MissingLeftBracketException
     {
         if (!token.isEmpty())
         {
@@ -437,8 +461,8 @@ public class Evaluator {
      */
     private static Token[] processString(String str) throws InvalidTokenException, MissingLeftBracketException, MissingRightBracketException, InvalidOperatorUseException
     {
-        Vector<Token> output = new Vector<Token>();
-        Stack<String> opStack = new Stack<String>();
+        ArrayList<Token> output = new ArrayList<>();
+        Stack<String> opStack = new Stack<>();
         Token[] ans;
         
         String buff = "";
@@ -497,7 +521,8 @@ public class Evaluator {
         System.out.println("Formula: " + str);
         
         for (int i = 0; i < output.size(); ++i)
-            System.out.println("    Token " + i + ": " + output.elementAt(i).toString());
+            System.out.println("    Token " + i + ": " + output.get(i).toString());
+        
         
         ans = new Token[output.size()];
         ans = (Token[])output.toArray(ans);
@@ -510,14 +535,14 @@ public class Evaluator {
      * @param output the tokenlist to test
      * @return true if the tokenlist is correct, otherwise false
      */
-    private static boolean verify(Vector<Token> output)
+    private static boolean verify(ArrayList<Token> output)
     {
         int pretend_stack_size = 0;
         for (int i = 0; i < output.size(); ++i)
         {
-            if (output.elementAt(i).getType() == Token.INSTRUCTION.CONSTANT || output.elementAt(i).getType() == Token.INSTRUCTION.VARIABLE) //If its z or constant we push (so add 1)
+            if (output.get(i).getType() == Token.INSTRUCTION.CONSTANT || output.get(i).getType() == Token.INSTRUCTION.VARIABLE) //If its z or constant we push (so add 1)
                 ++pretend_stack_size;
-            else if (output.elementAt(i).getType() == Token.INSTRUCTION.OPERATOR && output.elementAt(i).getData().getReal() < 6) //If its binary operator we pop 2 and push 1 (so decrement 1)
+            else if (output.get(i).getType() == Token.INSTRUCTION.OPERATOR && output.get(i).getData().getReal() < 6) //If its binary operator we pop 2 and push 1 (so decrement 1)
                 --pretend_stack_size;
         }
         return (pretend_stack_size == 1);
