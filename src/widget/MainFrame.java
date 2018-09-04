@@ -5,13 +5,8 @@
  */
 package widget;
 
-import complex.evaluator.Evaluator;
-import complex.Landscape;
 import complex.Complex;
-import complex.History;
 import java.awt.BorderLayout;
-import javax.swing.JButton;
-import javax.swing.JToolBar;
 
 /**
  * Main frame showing ComplexComponent
@@ -24,24 +19,14 @@ public class MainFrame extends javax.swing.JFrame {
      * mouse events
      */
     private final ComplexComponent _canvas;
-    
-    /**
-     * History class responsible for keeping track of undo/redo history
-     */
-    private History<Landscape> _history;
 
     /**
      * Creates new MainFrame form
      */
     public MainFrame() {
         
-        _history = new History();
-        
-        //Add first landscape, using a default Evaluator
-        _history.add(new Landscape(new Evaluator(), new Complex(-10,-10), new Complex(10,10)));
-        
         //Initialise ComplexComponent with first landscape
-        _canvas = new ComplexComponent(_history.getCurrent());
+        _canvas = new ComplexComponent(this);
         
         //Setup physical attributes for ComplexComponent and frame
         _canvas.setLayout(new BorderLayout());
@@ -49,11 +34,13 @@ public class MainFrame extends javax.swing.JFrame {
         
         super.setDefaultCloseOperation(EXIT_ON_CLOSE);
         super.setSize(1800, 1000);
-        super.setVisible(true);
         
         super.setMinimumSize(new java.awt.Dimension (200, 200));
         
         initComponents();
+        
+        lblZ.setText("");
+        lblFz.setText("");
         
         CanvasPane.add(_canvas);
     }
@@ -62,9 +49,21 @@ public class MainFrame extends javax.swing.JFrame {
     public void paint(java.awt.Graphics g) 
     { 
         if (_canvas != null && CanvasPane != null)
-            _canvas.setSize( CanvasPane.getWidth() - 20 , CanvasPane.getHeight() - 20); 
+            _canvas.setSize( CanvasPane.getWidth() - 20 , CanvasPane.getHeight() - 0); 
         super.paint(g); 
     }
+    
+    public void onTrace(Complex val)
+    {
+        lblZ.setText(val.toString());
+        lblFz.setText(_canvas.getLandscape().getEvaluator().f(val).toString());
+    }
+    
+    /**
+     * Exposes the current evaluator in use, for use with the calculator dialog
+     * @return 
+     */
+    public complex.evaluator.Evaluator getCurrentEvaluator() { return _canvas.getLandscape().getEvaluator(); }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -84,16 +83,19 @@ public class MainFrame extends javax.swing.JFrame {
         btnUndo = new javax.swing.JButton();
         btnRedo = new javax.swing.JButton();
         btnZoomIn = new javax.swing.JButton();
+        btnCalculate = new javax.swing.JButton();
         btnZoomOut = new javax.swing.JButton();
         CanvasPane = new javax.swing.JPanel();
         StatusPane = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        lblFz = new javax.swing.JLabel();
+        lblZ = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        MenuPane.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         btnNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/new.png"))); // NOI18N
         btnNew.addActionListener(new java.awt.event.ActionListener() {
@@ -101,7 +103,6 @@ public class MainFrame extends javax.swing.JFrame {
                 btnNewActionPerformed(evt);
             }
         });
-        MenuPane.add(btnNew, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 30, 28));
 
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/save.png"))); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -109,7 +110,6 @@ public class MainFrame extends javax.swing.JFrame {
                 btnSaveActionPerformed(evt);
             }
         });
-        MenuPane.add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(36, 0, 30, 28));
 
         btnPan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/pan.png"))); // NOI18N
         btnPan.addActionListener(new java.awt.event.ActionListener() {
@@ -117,7 +117,6 @@ public class MainFrame extends javax.swing.JFrame {
                 btnPanActionPerformed(evt);
             }
         });
-        MenuPane.add(btnPan, new org.netbeans.lib.awtextra.AbsoluteConstraints(72, 0, 30, 28));
 
         btnZoom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/zoom.png"))); // NOI18N
         btnZoom.addActionListener(new java.awt.event.ActionListener() {
@@ -125,7 +124,6 @@ public class MainFrame extends javax.swing.JFrame {
                 btnZoomActionPerformed(evt);
             }
         });
-        MenuPane.add(btnZoom, new org.netbeans.lib.awtextra.AbsoluteConstraints(108, 0, 30, 28));
 
         btnNewton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/newton.png"))); // NOI18N
         btnNewton.addActionListener(new java.awt.event.ActionListener() {
@@ -133,7 +131,6 @@ public class MainFrame extends javax.swing.JFrame {
                 btnNewtonActionPerformed(evt);
             }
         });
-        MenuPane.add(btnNewton, new org.netbeans.lib.awtextra.AbsoluteConstraints(144, 0, 30, 28));
 
         btnUndo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/undo.png"))); // NOI18N
         btnUndo.addActionListener(new java.awt.event.ActionListener() {
@@ -141,7 +138,6 @@ public class MainFrame extends javax.swing.JFrame {
                 btnUndoActionPerformed(evt);
             }
         });
-        MenuPane.add(btnUndo, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 0, 30, 28));
 
         btnRedo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/redo.png"))); // NOI18N
         btnRedo.addActionListener(new java.awt.event.ActionListener() {
@@ -149,7 +145,6 @@ public class MainFrame extends javax.swing.JFrame {
                 btnRedoActionPerformed(evt);
             }
         });
-        MenuPane.add(btnRedo, new org.netbeans.lib.awtextra.AbsoluteConstraints(216, 0, 30, 28));
 
         btnZoomIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/zoomin.png"))); // NOI18N
         btnZoomIn.addActionListener(new java.awt.event.ActionListener() {
@@ -157,7 +152,13 @@ public class MainFrame extends javax.swing.JFrame {
                 btnZoomInActionPerformed(evt);
             }
         });
-        MenuPane.add(btnZoomIn, new org.netbeans.lib.awtextra.AbsoluteConstraints(252, 0, 30, 28));
+
+        btnCalculate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/calculator.png"))); // NOI18N
+        btnCalculate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCalculateActionPerformed(evt);
+            }
+        });
 
         btnZoomOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/zoomout.png"))); // NOI18N
         btnZoomOut.addActionListener(new java.awt.event.ActionListener() {
@@ -165,7 +166,46 @@ public class MainFrame extends javax.swing.JFrame {
                 btnZoomOutActionPerformed(evt);
             }
         });
-        MenuPane.add(btnZoomOut, new org.netbeans.lib.awtextra.AbsoluteConstraints(288, 0, 30, 28));
+
+        javax.swing.GroupLayout MenuPaneLayout = new javax.swing.GroupLayout(MenuPane);
+        MenuPane.setLayout(MenuPaneLayout);
+        MenuPaneLayout.setHorizontalGroup(
+            MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(MenuPaneLayout.createSequentialGroup()
+                .addComponent(btnNew, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(btnPan, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(btnZoom, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(btnNewton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(btnCalculate, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnUndo, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnRedo, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnZoomIn, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        MenuPaneLayout.setVerticalGroup(
+            MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(btnNew, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnPan, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnZoom, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnNewton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnCalculate, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnUndo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnRedo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnZoomIn, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
 
         javax.swing.GroupLayout CanvasPaneLayout = new javax.swing.GroupLayout(CanvasPane);
         CanvasPane.setLayout(CanvasPaneLayout);
@@ -175,18 +215,41 @@ public class MainFrame extends javax.swing.JFrame {
         );
         CanvasPaneLayout.setVerticalGroup(
             CanvasPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 918, Short.MAX_VALUE)
+            .addGap(0, 924, Short.MAX_VALUE)
         );
+
+        jLabel1.setText("jLabel1");
+
+        jLabel2.setText("jLabel1");
+
+        lblFz.setText("jLabel1");
+
+        lblZ.setText("jLabel1");
 
         javax.swing.GroupLayout StatusPaneLayout = new javax.swing.GroupLayout(StatusPane);
         StatusPane.setLayout(StatusPaneLayout);
         StatusPaneLayout.setHorizontalGroup(
             StatusPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1762, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, StatusPaneLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblZ, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblFz, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         StatusPaneLayout.setVerticalGroup(
             StatusPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 26, Short.MAX_VALUE)
+            .addGroup(StatusPaneLayout.createSequentialGroup()
+                .addGroup(StatusPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2)
+                    .addComponent(lblFz)
+                    .addComponent(lblZ))
+                .addGap(0, 4, Short.MAX_VALUE))
         );
 
         jMenu1.setText("File");
@@ -218,72 +281,57 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnZoomOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZoomOutActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnZoomOutActionPerformed
+    private void btnCalculateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCalculateActionPerformed
+        CalculatorDialog d = new CalculatorDialog(this);
+        d.setVisible(true);
+    }//GEN-LAST:event_btnCalculateActionPerformed
 
     private void btnZoomInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZoomInActionPerformed
-        // TODO add your handling code here:
+        _canvas.centerZoom(-1.0/3.0);
     }//GEN-LAST:event_btnZoomInActionPerformed
 
     private void btnRedoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRedoActionPerformed
-        // TODO add your handling code here:
-        if (!_history.isAtTop())
-        {
-            _history.redo();
-            _canvas.setLandscape(_history.getCurrent());
-            _canvas.repaint();
-        }
+        _canvas.redo();
     }//GEN-LAST:event_btnRedoActionPerformed
 
     private void btnUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUndoActionPerformed
-        // TODO add your handling code here:
-        System.out.println("Pointer: " + _history.getPointer() + ", Size: " + _history.toArray().length + "Res: " + (!_history.isAtBottom()));
-        if (!_history.isAtBottom())
-        {
-            _history.undo();
-            _canvas.setLandscape(_history.getCurrent());
-            _canvas.repaint();
-        }
+        _canvas.undo();
     }//GEN-LAST:event_btnUndoActionPerformed
 
     private void btnNewtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewtonActionPerformed
-        // TODO add your handling code here:
-
+        _canvas.setAction(ComplexComponent.ActionType.NEWTON);
     }//GEN-LAST:event_btnNewtonActionPerformed
 
     private void btnZoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZoomActionPerformed
         // TODO add your handling code here:
-
+        _canvas.setAction(ComplexComponent.ActionType.ZOOM);
     }//GEN-LAST:event_btnZoomActionPerformed
 
     private void btnPanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPanActionPerformed
-        // TODO add your handling code here:
-
+        _canvas.setAction(ComplexComponent.ActionType.PAN);
     }//GEN-LAST:event_btnPanActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-        // TODO add your handling code here:
-        PropertyDialog d = new PropertyDialog(this, _history.getCurrent());
-
+        
+        PropertyDialog d = new PropertyDialog(this, _canvas.getLandscape());
+        
         if (d.isAccepted())
-        {
-            _history.add(d.getLandscape());
-            _canvas.setLandscape(_history.getCurrent());
-            _canvas.repaint();
-        }
-
-        System.out.println(_history.toString());
+            _canvas.changeLandscape(d.getLandscape());
     }//GEN-LAST:event_btnNewActionPerformed
+
+    private void btnZoomOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZoomOutActionPerformed
+        _canvas.centerZoom(1.0);
+    }//GEN-LAST:event_btnZoomOutActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel CanvasPane;
     private javax.swing.JPanel MenuPane;
     private javax.swing.JPanel StatusPane;
+    private javax.swing.JButton btnCalculate;
     private javax.swing.JButton btnNew;
     private javax.swing.JButton btnNewton;
     private javax.swing.JButton btnPan;
@@ -293,8 +341,12 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnZoom;
     private javax.swing.JButton btnZoomIn;
     private javax.swing.JButton btnZoomOut;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JLabel lblFz;
+    private javax.swing.JLabel lblZ;
     // End of variables declaration//GEN-END:variables
 }

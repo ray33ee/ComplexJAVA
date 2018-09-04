@@ -6,6 +6,7 @@
 package complex;
 
 import java.awt.Color;
+import java.text.DecimalFormat;
 
 /**
  * Complex class inherited from org.apache.commons.math3.complex.Complex. Adds 
@@ -14,14 +15,13 @@ import java.awt.Color;
  */
 public class Complex extends org.apache.commons.math3.complex.Complex
 {
+    public Complex() { super(0); }
+    
     public Complex(double real) { super(real); }
     
     public Complex(double real, double imag) { super(real, imag); }
     
-    public Complex(org.apache.commons.math3.complex.Complex z)
-    {
-        super(z.getReal(), z.getImaginary());
-    }
+    public Complex(org.apache.commons.math3.complex.Complex z) { super(z.getReal(), z.getImaginary()); }
     
     public Complex add(Complex z) { return new Complex(super.add(z)); }
     
@@ -29,6 +29,7 @@ public class Complex extends org.apache.commons.math3.complex.Complex
     
     public Complex multiply(Complex z) { return new Complex(super.multiply(z)); }
     
+    @Override
     public Complex multiply(double r) { return new Complex(super.multiply(r)); }
     
     public Complex divide(Complex z) { return new Complex(super.divide(z)); }
@@ -39,25 +40,25 @@ public class Complex extends org.apache.commons.math3.complex.Complex
     
     public Complex ln() { return new Complex(super.log()); }
     
-    public Complex negate() { return new Complex(super.negate()); }
+    @Override public Complex negate() { return new Complex(super.negate()); }
     
-    public Complex conjugate() { return new Complex(super.conjugate()); }
+    @Override public Complex conjugate() { return new Complex(super.conjugate()); }
     
-    public Complex exp() { return new Complex(super.exp()); }
+    @Override public Complex exp() { return new Complex(super.exp()); }
     
-    public Complex sqrt() { return new Complex(super.sqrt()); }
+    @Override public Complex sqrt() { return new Complex(super.sqrt()); }
     
-    public Complex asin() { return new Complex(super.asin()); }
+    @Override public Complex asin() { return new Complex(super.asin()); }
     
-    public Complex acos() { return new Complex(super.acos()); }
+    @Override public Complex acos() { return new Complex(super.acos()); }
     
-    public Complex atan() { return new Complex(super.atan()); }
+    @Override public Complex atan() { return new Complex(super.atan()); }
     
-    public Complex sin() { return new Complex(super.sin()); }
+    @Override public Complex sin() { return new Complex(super.sin()); }
     
-    public Complex cos() { return new Complex(super.cos()); }
+    @Override public Complex cos() { return new Complex(super.cos()); }
     
-    public Complex tan() { return new Complex(super.tan()); }
+    @Override public Complex tan() { return new Complex(super.tan()); }
     
     public Complex asinh() { return new Complex(super.asin()); }
     
@@ -65,11 +66,11 @@ public class Complex extends org.apache.commons.math3.complex.Complex
     
     public Complex atanh() { return new Complex(super.atan()); }
     
-    public Complex sinh() { return new Complex(super.sinh()); }
+    @Override public Complex sinh() { return new Complex(super.sinh()); }
     
-    public Complex cosh() { return new Complex(super.cosh()); }
+    @Override public Complex cosh() { return new Complex(super.cosh()); }
     
-    public Complex tanh() { return new Complex(super.tanh()); }
+    @Override public Complex tanh() { return new Complex(super.tanh()); }
     
     
     /**
@@ -78,9 +79,9 @@ public class Complex extends org.apache.commons.math3.complex.Complex
      * @param z the complex number, z
      * @return  the colour of the complex number, z
      */
-    public Color color(Complex z)
+    public Color color()
     {
-        float arg = (float)z.getArgument();
+        float arg = (float)super.getArgument();
         float hue = arg;
         
         //Convert argument from -pi to pi --> 0 to 2pi
@@ -140,17 +141,33 @@ public class Complex extends org.apache.commons.math3.complex.Complex
             return p;
     }
     
+    /**
+     * Private function to convert double to string. If the magnitude of the value is larger than 1e7, 
+     * scientific notation is used, otherwise fixed point notation is used.
+     * @param val value to convert
+     * @return the formatted string
+     */
+    private static String myConvert(double val)
+    {
+        DecimalFormat form;
+        
+        if (val > 1e7 || val < -1e7)
+            form = new DecimalFormat("0.####E0");
+        else
+            form = new DecimalFormat("######0.####");
+        
+        return form.format(val);
+    }
+    
     @Override
     public String toString()
     {
         if (getImaginary() == 0.0) //If the number is real
-            return String.valueOf(getReal());
+            return myConvert(getReal());
             
-        
-
         if (getReal() == 0.0) //If the number is exclusively imaginary
-            return String.valueOf(getImaginary()) + "*i";
-
-        return String.valueOf(getReal()) + (getImaginary() < 0 ? " - " : " + ") + (Math.abs(getImaginary()) == 1 ? "i" : (String.valueOf(Math.abs(getImaginary())) + "*i"));
+            return myConvert(getImaginary()) + "*i";
+        
+        return myConvert(getReal()) + (getImaginary() < 0 ? " - " : " + ") + (Math.abs(getImaginary()) == 1 ? "i" : (myConvert(Math.abs(getImaginary())) + "*i"));
     }
 }

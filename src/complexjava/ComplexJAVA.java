@@ -18,15 +18,10 @@ import widget.MainFrame;
  */
 public class ComplexJAVA  
 {
-
    /**
      * @param args the command line arguments
      */
-   public static void main(String[] args) 
-   {
-        MainFrame frame = new MainFrame();
-   }
-    
+   public static void main(String[] args) { MainFrame frame = new MainFrame(); frame.setVisible(true); }
 }
 
 

@@ -18,17 +18,17 @@ public class Landscape
     /**
      * The evaluator class containing the token list and other information
      */
-    private Evaluator _evaltor;
+    private final Evaluator _evaltor;
     
     /**
      * The minimum value in the domain, that is the bottom left of the landscape
      */
-    private Complex _min;
+    private final Complex _min;
     
     /**
      * The maximum value in the domain, that is the top right of the landscape
      */
-    private Complex _max;
+    private final Complex _max;
     
     /**
      * Constructs a new landscape, with supplied values

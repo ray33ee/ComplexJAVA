@@ -13,12 +13,16 @@ import javax.swing.JComponent;
 
 import com.nativelibs4java.opencl.*;
 import com.nativelibs4java.util.*;
+import complex.Complex;
+import complex.History;
 import org.bridj.Pointer;
 import static org.bridj.Pointer.*;
 import java.io.IOException;
 
 import complex.Token;
 import complex.Landscape;
+import complex.evaluator.Evaluator;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -37,13 +41,8 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     private final int REALS_PER_COMPLEX = 2;
     
     private CLContext   _context;
-    private CLKernel    _kernel;
+    private final CLKernel    _kernel;
     private CLQueue     _queue;
-    
-    /**
-     * Contains the variables needed to draw a complex landscape. See Landscape class.
-     */
-    private Landscape _landscape;
     
     /**
      * Stores the action being used. Either Pan, zoom or newton raphson. 
@@ -51,30 +50,47 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     private ActionType _action;
     
     /**
-     * Construct Complex component and initialise JComponent and member variables.
-     * @param land the initial landscape to draw
+     * History class responsible for keeping track of undo/redo history
      */
-    public ComplexComponent(Landscape land)
+    private History<Landscape> _history;
+    
+    /**
+     * Stores the complex value at the position where the user has initiated a mousePress event
+     */
+    private Complex _press; 
+    
+    /**
+     * Stores reference to parent object
+     */
+    private final MainFrame _parent;
+    
+    /**
+     * Construct Complex component and initialise JComponent and member variables.
+     * @param parent the parent of the Component
+     */
+    public ComplexComponent(MainFrame parent)
     {
         super();
+        
+        _history = new History();
+        
+        //Add first landscape, using a default Evaluator
+        _history.add(new Landscape(new Evaluator(), new Complex(-10,-10), new Complex(10,10)));
+        
+        //Find the best context
         _context = JavaCL.createBestContext(CLPlatform.DeviceFeature.DoubleSupport);
         
-        _landscape = new Landscape(land.getEvaluator(), land.getMinDomain(), land.getMaxDomain());
-        
+        //Set the default action to pan
         _action = ActionType.PAN; 
-       
-        for (int i = 0; i < JavaCL.listPlatforms().length; ++i)
-        {
-            System.out.println("Platform: " + i + " is " + JavaCL.listPlatforms()[i].getName());
-            for (int j = 0; j < JavaCL.listPlatforms()[i].listAllDevices(true).length; ++j)
-                System.out.println("    Device: " + j + " " + JavaCL.listPlatforms()[i].listAllDevices(true)[j].getName());
-        }
         
-        System.out.println("widget.ComplexComponent.<init>()");
+        //Set initial press value
+        _press = new Complex();
+
+        _parent = parent;
         
         _queue = _context.createDefaultQueue();
-        String src = "";
         
+        String src = "";
         try
         {
             src = IOUtils.readText(ComplexComponent.class.getResource("/kernel/kernel.cl"));
@@ -83,16 +99,70 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         {
             System.err.println("IOException in widget.ComplexComponent.<init>()" + e.getMessage());
         }
-        
         CLProgram program = _context.createProgram(src);
         program.addInclude("/include/");
         _kernel = program.createKernel("get_landscape");
 
+        //Display all devices in the selected context
+        System.out.println("Using device(s)...");
         for (int i = 0; i < _context.getDevices().length; ++i)
-            System.out.println("Using Device " + i + " " + _context.getDevices()[i].getName());
+            System.out.println("    " + _context.getDevices()[i].getName());
             
         super.addMouseMotionListener(this);
         super.addMouseListener(this);
+    }
+    
+    /**
+     * Performs a zoom about the center of the landscape with the given factor
+     * @param factor the zoom scale factor
+     */
+    public void centerZoom(double factor)
+    {
+        Complex min = _history.getCurrent().getMinDomain();
+        Complex max = _history.getCurrent().getMaxDomain();
+        
+        Complex diff = max.subtract(min);
+        
+        Landscape land = new Landscape(_history.getCurrent().getEvaluator(), min.subtract(diff.multiply(factor)), max.add(diff.multiply(factor)));
+        
+        _history.add(land);
+        changeLandscape(_history.getCurrent());
+    }
+    
+    /**
+     * Revert to the last landscape
+     */
+    public void undo()
+    {
+        if (!_history.isAtBottom())
+        {
+            _history.undo();
+            repaint();
+        }
+    }
+    
+    /**
+     * Revert to the previously undone landscape
+     */
+    public void redo()
+    {
+        if (!_history.isAtTop())
+        {
+            _history.redo();
+            repaint();
+        }
+    }
+    
+    /**
+     * Gets the complex value the user is pointing to.
+     * @param p the point from which to get the trace
+     * @return the complex value at point p
+     */
+    public Complex trace(Point p) 
+    {
+        Complex diff = new Complex(_history.getCurrent().getMaxDomain().getReal() - _history.getCurrent().getMinDomain().getReal(), _history.getCurrent().getMinDomain().getImaginary() - _history.getCurrent().getMaxDomain().getImaginary());
+        
+        return new Complex((double)p.x / getWidth() * diff.getReal() + _history.getCurrent().getMinDomain().getReal(), (double)p.y / getHeight()* diff.getImaginary()+ _history.getCurrent().getMaxDomain().getImaginary());
     }
     
     /**
@@ -102,33 +172,66 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     public int getArea() { return getWidth() * getHeight(); }
     
     /**
+     * Set the action for the component, either pan, zoom or newton/raphson method
+     * @param a 
+     */
+    public void setAction(ActionType a) { _action = a; }
+    
+    /**
      * Get the current landscape on display
      * @return _landscape
      */
-    public Landscape getLandscape() { return _landscape; }
+    public Landscape getLandscape() { return _history.getCurrent(); }
     
     /**
      * Set the current landscape
      * @param land the landscape to set to
      */
-    public void setLandscape(Landscape land) { _landscape = land; }
+    public void changeLandscape(Landscape land) { _history.add(land); super.repaint(); }
     
     @Override
     public void mouseMoved(MouseEvent e)
     {
-        //System.out.println("MOVE: " + e.toString());
+        _parent.onTrace(trace(e.getPoint()));
     }
     
     @Override
     public void mousePressed(MouseEvent e) 
     {
-        System.out.println("DOWN");
+        if (_action == ActionType.PAN || _action == ActionType.ZOOM)
+            _press = trace(e.getPoint());
     }
 
     @Override
     public void mouseReleased(MouseEvent e) 
     {
-        System.out.println("UP");
+        Complex release;
+        Landscape land;
+        switch (_action)
+        {
+            case PAN:
+                release = trace(e.getPoint());
+                Complex movement = release.subtract(_press);
+
+                land = new Landscape(_history.getCurrent().getEvaluator(), _history.getCurrent().getMinDomain().subtract(movement),  _history.getCurrent().getMaxDomain().subtract(movement));
+
+                changeLandscape(land);
+                break;
+            case ZOOM:
+                release = trace(e.getPoint());
+                
+                Complex min = new Complex (Math.min(_press.getReal(), release.getReal()), Math.min(_press.getImaginary(), release.getImaginary()));
+                Complex max = new Complex (Math.max(_press.getReal(), release.getReal()), Math.max(_press.getImaginary(), release.getImaginary()));
+                
+                land = new Landscape(_history.getCurrent().getEvaluator(), min, max);
+                
+                changeLandscape(land);
+                break;
+            case NEWTON:
+                
+                break;
+        }
+        
     }
     
     @Override
@@ -145,7 +248,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         int[] imagePixelData = ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
         
         //Get a copy of the token list
-        Token[] list = _landscape.getEvaluator().getTokens();
+        Token[] list = _history.getCurrent().getEvaluator().getTokens();
         
         //Token list is implemented as a list of floats. Each group of three floats represents real, imaginary and type of a token
         Pointer<Float> tokenPtr = allocateFloats(list.length * 3); //.order(_context.getByteOrder());
@@ -167,19 +270,19 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         //Create a stack of floats or doubles, depending on support
         CLBuffer stackbuff;
         if (_context.isDoubleSupported())
-            stackbuff = _context.createDoubleBuffer(CLMem.Usage.Output, getArea() * _landscape.getEvaluator().getStackMax() * REALS_PER_COMPLEX);
+            stackbuff = _context.createDoubleBuffer(CLMem.Usage.Output, getArea() * _history.getCurrent().getEvaluator().getStackMax() * REALS_PER_COMPLEX);
         else
-            stackbuff = _context.createFloatBuffer(CLMem.Usage.Output, getArea() * _landscape.getEvaluator().getStackMax() * REALS_PER_COMPLEX);
+            stackbuff = _context.createFloatBuffer(CLMem.Usage.Output, getArea() * _history.getCurrent().getEvaluator().getStackMax() * REALS_PER_COMPLEX);
         
         // Get and call the kernel : max.imag and min.imag have been swapped because 0,0 (which is top left) should be bottom 
         _kernel.setArgs(
                 tokenBuff, stackbuff,
                 list.length,
-                (float)_landscape.getMinDomain().getReal(), 
-                (float)_landscape.getMaxDomain().getImaginary(), 
-                (float)(_landscape.getMaxDomain().getReal() - _landscape.getMinDomain().getReal()), 
-                (float)(_landscape.getMinDomain().getImaginary() - _landscape.getMaxDomain().getImaginary()),
-                getWidth(), getHeight(), outbuff, getArea(), _landscape.getEvaluator().getStackMax());
+                (float)_history.getCurrent().getMinDomain().getReal(), 
+                (float)_history.getCurrent().getMaxDomain().getImaginary(), 
+                (float)(_history.getCurrent().getMaxDomain().getReal() - _history.getCurrent().getMinDomain().getReal()), 
+                (float)(_history.getCurrent().getMinDomain().getImaginary() - _history.getCurrent().getMaxDomain().getImaginary()),
+                getWidth(), getHeight(), outbuff, getArea(), _history.getCurrent().getEvaluator().getStackMax());
         
         int[] globalSizes = new int[] { getWidth(), getHeight() };
         
@@ -188,9 +291,6 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         
         //Wait for completion and get results
         outbuff.read(_queue, addEvt).getInts(imagePixelData); // blocks until add_floats finished
-        
-        /*for (int i = 0; i < 10; ++i)
-            System.out.println("DEBUG imagePixelData[" + i + "] = " + imagePixelData[i]);*/
 
         return bufferedImage;
    }

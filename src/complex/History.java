@@ -11,6 +11,7 @@ import java.util.ArrayList;
  * History class (as well as being a dry subject) contains the entire history in an 
  * recorded after any change, undo or redo initiated.
  * @author Will
+ * @param <T> type of object in list
  */
 public class History<T>
 {

@@ -97,7 +97,7 @@ public class Evaluator {
      * max stack size. 
      * @param formula the formula to convert
      */
-    public void setString(String formula) throws InvalidTokenException, MissingLeftBracketException, MissingRightBracketException, InvalidOperatorUseException { _tokenlist = processString(formula); calculateStackmax(); _equation = formula; }
+    public void setString(String formula) throws InvalidTokenException, MissingLeftBracketException, MissingRightBracketException, InvalidOperatorUseException { _tokenlist = processString(formula); calculateStackmax(); _equation = formula; System.out.println(toString());  }
     
     /**
      * Use the formula from the token list to calculate the expression f(z)
@@ -182,13 +182,13 @@ public class Evaluator {
                             stack[pointer-1] = stack[pointer-1].tan();
                             break;
                         case 17:
-                            
+                            stack[pointer-1] = stack[pointer-1].asinh();
                             break;
                         case 18:
-                            
+                            stack[pointer-1] = stack[pointer-1].acosh();
                             break;
                         case 19:
-                            
+                            stack[pointer-1] = stack[pointer-1].atanh();
                             break;
                         case 20:
                             stack[pointer-1] = stack[pointer-1].asin();
@@ -417,7 +417,7 @@ public class Evaluator {
                 {
                     while (!opStack.isEmpty())
                     {
-                        if ((isOp(opStack.peek()) && getPrecedence(opStack.peek()) > getPrecedence(token)) || (isOp(opStack.peek()) && getPrecedence(opStack.peek()) == getPrecedence(token) && token.equals("^") && !opStack.peek().equals("(")))
+                        if ((isOp(opStack.peek()) && getPrecedence(opStack.peek()) > getPrecedence(token)) || (isOp(opStack.peek()) && getPrecedence(opStack.peek()) == getPrecedence(token) && !token.equals("^") && !opStack.peek().equals("(")))
                             output.add(new Token(new Complex(getIndex(opStack.pop())), Token.INSTRUCTION.OPERATOR));
                         else
                             break;
@@ -468,7 +468,7 @@ public class Evaluator {
         String buff = "";
         String prev = "";
         
-        str.toLowerCase();
+        str = str.toLowerCase();
         
         str = removeWhitespace(str);
         
@@ -478,7 +478,7 @@ public class Evaluator {
             
             if (i == 0)
             {
-                if (ch == '-')
+                if (ch == '-' || ch == '(')
                     sendToken(output, opStack, new String(new char[] {ch} ), prev);
                 else
                     buff += ch;
@@ -517,11 +517,6 @@ public class Evaluator {
         
         if (!verify(output))
             throw new InvalidOperatorUseException("FIND OFFENDING OPERATOR");
-        
-        System.out.println("Formula: " + str);
-        
-        for (int i = 0; i < output.size(); ++i)
-            System.out.println("    Token " + i + ": " + output.get(i).toString());
         
         
         ans = new Token[output.size()];
@@ -566,4 +561,21 @@ public class Evaluator {
         }
         
     }
+    
+    @Override
+    public String toString()
+    {
+        String ans = "Evaluator(" + _equation + ") = { ";
+        
+        if (_tokenlist.length == 0)
+            return ans + " }";
+        
+        for (int i = 0; i < _tokenlist.length-1; ++i)
+            ans += _tokenlist[i].toString() + ", ";
+        
+        ans += _tokenlist[_tokenlist.length-1].toString() + " }";
+        
+        return ans;
+    }
+    
 }

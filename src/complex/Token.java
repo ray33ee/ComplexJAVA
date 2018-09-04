@@ -42,10 +42,7 @@ public class Token extends Object {
     /**
      * Constructs empty token, with data = 0 and type = EMPTY.
      */
-    public Token()
-    {
-        this(new Complex(0,0), INSTRUCTION.EMPTY);
-    }
+    public Token() { this(new Complex(0,0), INSTRUCTION.EMPTY); }
     
     /**
      * Construct token, composed of a data element, and a type element. Type element
@@ -53,29 +50,19 @@ public class Token extends Object {
      * @param data  
      * @param type 
      */
-    public Token(Complex data, INSTRUCTION type)
-    {
-        _data = data;
-        _type = type;
-    }
+    public Token(Complex data, INSTRUCTION type) { _data = data; _type = type; }
     
     /**
      * Get the _data element. 
      * @return the _data element
      */
-    public Complex getData()
-    {
-        return _data;
-    }
+    public Complex getData() { return _data; }
     
     /**
      * Get the _type element
      * @return the _type element
      */
-    public INSTRUCTION getType()
-    {
-        return _type;
-    }
+    public INSTRUCTION getType() { return _type; }
     
     /**
      * Get the _type as an integer 
@@ -99,19 +86,13 @@ public class Token extends Object {
      * Set the data in the token
      * @param data the data to set
      */
-    public void setData(Complex data)
-    {
-        _data = data;
-    }
+    public void setData(Complex data) { _data = data; }
     
     /**
      * Set the type in the token
      * @param type the type to set
      */
-    public void setInstruction(INSTRUCTION type)
-    {
-        _type = type;
-    }
+    public void setInstruction(INSTRUCTION type) { _type = type; }
     
     /**
      * Convert token to string format

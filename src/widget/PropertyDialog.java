@@ -31,6 +31,7 @@ public class PropertyDialog extends javax.swing.JDialog {
     /**
      * Creates new form propertyDialog
      * @param parent sets parent of dialog
+     * @param land the landscape to input into the text boxes
      */
     public PropertyDialog(java.awt.Frame parent, Landscape land) {
         super(parent, true);
@@ -43,9 +44,9 @@ public class PropertyDialog extends javax.swing.JDialog {
         txtMin.setText(land.getMinDomain().toString());
         txtMax.setText(land.getMaxDomain().toString());
         
-        setTitle("New Landscape...");
-        
-        setVisible(true);
+        super.setTitle("New Landscape...");
+        super.setLocation(parent.getX() + parent.getWidth() / 2 - super.getWidth() / 2, parent.getY() + parent.getHeight()/ 2 - super.getHeight()/ 2);
+        super.setVisible(true);
     }
     
     /**
@@ -114,9 +115,10 @@ public class PropertyDialog extends javax.swing.JDialog {
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGap(16, 16, 16)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(txtMax, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtMin, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(txtMin, javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(txtMax, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)))))
                 .addContainerGap(14, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -146,6 +148,7 @@ public class PropertyDialog extends javax.swing.JDialog {
         Complex min, max;
         Evaluator convert = new Evaluator();
         
+        //Convert mindomain text to complex number, inform user of errors
         try 
         {
             convert.setString(txtMin.getText());
@@ -158,6 +161,7 @@ public class PropertyDialog extends javax.swing.JDialog {
         
         min = convert.f(new Complex(0));
         
+        //Convert maxdomain text to complex number, inform user of errors
         try
         {
             convert.setString(txtMax.getText());
@@ -167,11 +171,10 @@ public class PropertyDialog extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, "Error in Maximum domain: " + e.getMessage(), "Maximum domain error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        
         max = convert.f(new Complex(0));
         
-        System.out.println("Min: " + min.toString());
-        System.out.println("Max: " + max.toString());
-        
+        //Convert formula text to token list, inform user of errors
         try
         {
             _landscape = new Landscape(new Evaluator(txtFormula.getText()), min, max);
@@ -182,13 +185,13 @@ public class PropertyDialog extends javax.swing.JDialog {
             return;
         }
         
+        //Close dialog
         _accepted = true;
         dispose();
     }//GEN-LAST:event_btnOkActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         // TODO add your handling code here:
-        
         _accepted = false;
         dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
