@@ -13,13 +13,19 @@
 
 // double
 typedef double real;
-#define PI 3.14159265358979323846
+#define R_PI M_PI
+#define R_PI_2 M_PI_2
+#define R_2_PI 6.28318530717958647692 //  2*pi
+#define R_1_2_PI 0.159154943091895335769 //  1/(2*pi)
 
 #else
 
 // float
 typedef float real;
-#define PI 3.14159265359f
+#define R_PI M_PI_F
+#define R_PI_2 M_PI_2_F
+#define R_2_PI 6.28318530718f //  2*pi
+#define R_1_2_PI 0.159154943091f //  1/(2*pi)
 
 #endif
 

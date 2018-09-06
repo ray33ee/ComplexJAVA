@@ -97,7 +97,7 @@ public class Evaluator {
      * max stack size. 
      * @param formula the formula to convert
      */
-    public void setString(String formula) throws InvalidTokenException, MissingLeftBracketException, MissingRightBracketException, InvalidOperatorUseException { _tokenlist = processString(formula); calculateStackmax(); _equation = formula; System.out.println(toString());  }
+    public void setString(String formula) throws InvalidTokenException, MissingLeftBracketException, MissingRightBracketException, InvalidOperatorUseException { _tokenlist = processString(formula); calculateStackmax(); _equation = formula; }
     
     /**
      * Use the formula from the token list to calculate the expression f(z)
@@ -358,7 +358,7 @@ public class Evaluator {
      * @param output
      * @param opStack
      * @param token
-     * @return 
+     * @return true if the token is a unary negative
      */
     private static boolean isUnaryNegative(ArrayList<Token> output, Stack<String> opStack, String prevToken) { return (output.isEmpty() && opStack.isEmpty()) || prevToken.equals("(") || prevToken.equals("neg") || isOp(prevToken); }
     

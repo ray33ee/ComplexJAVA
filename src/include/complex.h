@@ -16,7 +16,7 @@ struct ARGB
  * @param r red component
  * @return the complete ARGB structure with A= 255. b occupies the lowest 8 bits, and a the highest 8 bits.
  */
-struct ARGB ARGB_constructor(unsigned char b, unsigned char g, unsigned char r)
+struct ARGB ARGB_constructor(unsigned char r, unsigned char g, unsigned char b)
 {
     struct ARGB col;
     col.a = 255;
@@ -46,6 +46,8 @@ real c_arg(struct Complex);
 struct Complex c_exp(struct Complex);
 
 struct Complex c_ln(struct Complex);
+
+float  HueToRGB(float , float , float );
 
 /**
  * Constructs a complex number with real and imaginary parts
@@ -189,8 +191,8 @@ struct Complex c_sqrt(struct Complex z)
 {
     struct Complex ans;
     real squirt = sqrt(sqrt(z.re * z.re + z.im * z.im) + z.re);
-    ans.re = squirt / (PI / 2);
-    ans.im = z.im / (squirt * PI / 2);
+    ans.re = squirt / R_PI_2;
+    ans.im = z.im / (squirt * R_PI_2);
     return ans;
 };
 
@@ -250,70 +252,45 @@ struct Complex c_atan(struct Complex z) { return c_complexc(-1, -1); }
  * @param z the complex number
  * @return the absolute value of the complex number z, |z|.
  */
-real c_abs(struct Complex z)
-{
-    return sqrt(z.re * z.re + z.im * z.im);
-}
+real c_abs(struct Complex z) { return  hypot(z.re, z.im); }
 
 /**
  * Function gets the argument of the complex number
  * @param z the complex number
  * @return the argument, arg(z).
  */
-real c_arg(struct Complex z)
+real c_arg(struct Complex z) { return atan2(z.im, z.re); }
+
+struct ARGB HLtoRGB(float h, float l)
 {
-    return atan2(z.im, z.re); 
+    float q = l < 0.5 ? l*2 : 1;
+
+    float p = 2 * l - q;
+
+    float r = max(0.0f, (float)HueToRGB(p, q, h + (1.0f / 3.0f)));
+    float g = max(0.0f, (float)HueToRGB(p, q, h));
+    float b = max(0.0f, (float)HueToRGB(p, q, h - (1.0f / 3.0f)));
+
+    r = min(r, 1.0f);
+    g = min(g, 1.0f);
+    b = min(b, 1.0f);
+
+    return ARGB_constructor( r*255, g*255, b*255);
 }
 
-/**
- * Converts HSL model to RGB, with S = 1. 
- * @param h the hue value
- * @param l the lightness value
- * @return the colour as ARGB format
- */
-struct ARGB HLtoRGB(real h, real l)
+float  HueToRGB(float  p, float  q, float  h)
 {
+    if (h < 0) h += 1;
 
-    real v;
+    if (h > 1 ) h -= 1;
 
-    //As the argument could be pi radians, the hue could be 1.0. As this is an invalid value, this can be fixed by making the hue 0, which (as the hue is cyclic) is the same
-    if (h == 1.0)
-        h = 0;
+    if (6 * h < 1) return p + ((q - p) * 6 * h);
 
-    v = (l <= 0.5) ? l * 2 : 1;
+    if (2 * h < 1 ) return  q;
 
-    if (v > 0)
-    {
-        real m;
-        real sv;
-        int sextant;
-        real vsf, mid1, mid2;
+    if (3 * h < 2) return p + ( (q - p) * 6 * ((2.0f / 3.0f) - h) );
 
-        m = 2 * l - v;
-        sv = (v - m) / v;
-        h *= 6.0;
-        sextant = (int)h;
-        vsf = v * sv * (h - sextant);
-        mid1 = m + vsf;
-        mid2 = v - vsf;
-        switch (sextant)
-        {
-        case 0:
-                return ARGB_constructor((unsigned char)(mid2 * 255), (unsigned char)(v * 255), (unsigned char)(m * 255))  ;
-        case 1:
-                return ARGB_constructor((unsigned char)(m * 255), (unsigned char)(v * 255), (unsigned char)(mid1 * 255)) ;
-        case 2:
-                return ARGB_constructor((unsigned char)(m * 255), (unsigned char)(mid2 * 255), (unsigned char)(v * 255)) ;
-        case 3:
-                return ARGB_constructor((unsigned char)(mid1 * 255), (unsigned char)(m * 255), (unsigned char)(v * 255)) ;
-        case 4:
-                return ARGB_constructor((unsigned char)(v * 255), (unsigned char)(m * 255), (unsigned char)(mid2 * 255))  ;
-        case 5:
-                return ARGB_constructor((unsigned char)(v * 255), (unsigned char)(mid1 * 255), (unsigned char)(m * 255)) ;
-        }
-    }
-    //If the application gets here, there is a problem. Output the otherwise impossible grey to indicate error
-    return ARGB_constructor(0,0,255) ;
+    return p;
 }
 
 /**
@@ -323,26 +300,57 @@ struct ARGB HLtoRGB(real h, real l)
  */
 struct ARGB c_colour(struct Complex z)
 {
+    
+    //If z is zero, or contains a NaN component display as white
+    if ((z.re == 0.0 && z.im == 0.0) || isnan(z.re) || isnan(z.im) )
+        return ARGB_constructor (255, 255, 255);
+
+    //Both components are +/-inf
+    if (isinf(z.re) && isinf(z.im))
+    {
+        if (z.re > 0 && z.im > 0)
+            return ARGB_constructor (255, 0, 191) ;
+        else if (z.re < 0 && z.im > 0)
+            return ARGB_constructor (0, 64, 255) ;
+        else if (z.re < 0 && z.im < 0) 
+            return ARGB_constructor (0, 255, 64) ;
+        else
+            return ARGB_constructor (255, 191, 0) ;
+    }
+
+    //Either one, or the other component is +/1 inf
+    if (isinf(z.re) || isinf(z.im))
+    {
+        if (isinf(z.re) && z.re > 0)
+            return ARGB_constructor (255, 0, 0) ;
+        else if (isinf(z.re) && z.re < 0)
+            return ARGB_constructor (0, 255, 255) ;
+        else if(isinf(z.im) && z.im > 0)
+            return ARGB_constructor (128, 0, 255) ;
+        else
+            return ARGB_constructor (128, 255, 0) ;
+    }
+                
     real arg = c_arg(z);
     real hue = arg;
     real modarg = log(c_abs(z));
     real lightness;
-
+    
     //Convert argument from -pi to pi --> 0 to 2pi
     if (arg < 0)
-        hue = (2.0 * PI) + arg;
+        hue = R_2_PI + arg;
 
     //Convert from 0 to 2pi --> 0 to 1
-    hue /= 2.0 * PI;
+    hue = 1.0 - hue * R_1_2_PI;
     
     if (modarg < 0)
     {
-            lightness = 0.75 - c_abs(z) / 2.0;
+        lightness = 0.75 - c_abs(z) / 2.0;
     }
     else
     {
         if (!((int)modarg & 1)) //If whole part of modarg is even, 0 --> 1 maps to black --> white
-                lightness = (modarg - floor(modarg)) / 2.0 + 0.25;
+                lightness =  fmin( modarg - floor(modarg), (real)0x1.fffffep-1f ) / 2.0 + 0.25;
         else //If whole part of modarg is odd 0 --> 1 maps to white --> black
                 lightness = 0.75 - (modarg - floor(modarg)) / 2.0;
     }

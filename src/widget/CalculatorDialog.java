@@ -15,10 +15,7 @@ import javax.swing.JOptionPane;
  * @author Will
  */
 public class CalculatorDialog extends javax.swing.JDialog 
-{
-    
-    private final MainFrame _parent;
-    
+{    
     /**
      * Creates new form CalculateDialog
      * @param parent the parent of this dialog
@@ -28,14 +25,9 @@ public class CalculatorDialog extends javax.swing.JDialog
         super(parent, false);
         initComponents();
         
-        lblColor.setOpaque(true);
-        
-        
-        _parent = parent;
-        
         txtFormula.setText(parent.getCurrentEvaluator().getEquation());
         txtInput.setText("0");
-        lblOutput.setText(parent.getCurrentEvaluator().f(new complex.Complex()).toString());
+        lblOutput.setText(parent.getCurrentEvaluator().f(new complex.Complex()).toAccurateString());
         lblColor.setBackground(parent.getCurrentEvaluator().f(new complex.Complex()).color());
         
         super.setTitle("Calculator");
@@ -93,23 +85,19 @@ public class CalculatorDialog extends javax.swing.JDialog
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(84, 84, 84)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtInput)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblOutput, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(lblColor, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(lblOutput, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblColor, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap(222, Short.MAX_VALUE)
+                        .addGap(0, 216, Short.MAX_VALUE)
                         .addComponent(btnCalculate)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane2)))
+                    .addComponent(txtInput, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -160,7 +148,7 @@ public class CalculatorDialog extends javax.swing.JDialog
         
         Complex result = eval.f(z);
         
-        lblOutput.setText(result.toString());
+        lblOutput.setText(result.toAccurateString());
         lblColor.setBackground(result.color());
         
     }//GEN-LAST:event_btnCalculateActionPerformed

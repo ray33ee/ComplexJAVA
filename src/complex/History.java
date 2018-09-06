@@ -74,6 +74,10 @@ public class History<T>
     
     public Object[] toArray() { return _history.toArray(); }
     
+    /**
+     * Get the present item in the history
+     * @return the current/present item
+     */
     public T getCurrent() { return (T)_history.get(_pointer-1); }
     
     @Override

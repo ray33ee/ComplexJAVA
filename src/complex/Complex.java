@@ -74,33 +74,79 @@ public class Complex extends org.apache.commons.math3.complex.Complex
     
     
     /**
-    
-    * Gets the colour of the complex number, as per the domain colouring method
-     * @param z the complex number, z
-     * @return  the colour of the complex number, z
+    * Gets the colour of this complex number, as per the domain colouring method
+     * @return  the colour of this complex number
      */
     public Color color()
     {
+        //If z is zero, or contains a NaN component display as white
+        if ((getReal() == 0.0 && getImaginary()== 0.0) || Double.isNaN(getReal()) || Double.isNaN(getImaginary()) )
+            return new Color(255, 255, 255);
+
+        //Both components are +/-inf
+        if (Double.isInfinite(getReal()) && Double.isInfinite(getImaginary()))
+        {
+            if (getReal() > 0 && getImaginary() > 0)
+                return new Color(255, 0, 191) ;
+            else if (getReal() < 0 && getImaginary() > 0)
+                return new Color(0, 64, 255) ;
+            else if (getReal() < 0 && getImaginary() < 0) 
+                return new Color(0, 255, 64) ;
+            else
+                return new Color(255, 191, 0) ;
+        }
+
+        //Either one, or the other component is +/1 inf
+        if (Double.isInfinite(getReal()) || Double.isInfinite(getImaginary()))
+        {
+            if (Double.isInfinite(getReal()) && getReal() > 0)
+                return new Color(255, 0, 0) ;
+            else if (Double.isInfinite(getReal()) && getReal() < 0)
+                return new Color(0, 255, 255) ;
+            else if(Double.isInfinite(getImaginary()) && getImaginary() > 0)
+                return new Color(128, 0, 255) ;
+            else
+                return new Color(128, 255, 0) ;
+        }
+    
         float arg = (float)super.getArgument();
         float hue = arg;
-        
+        float modarg = (float)Math.log(super.abs());
+        float lightness;
+
         //Convert argument from -pi to pi --> 0 to 2pi
         if (arg < 0)
             hue = 2.0f * (float)Math.PI + arg;
         
         //Convert from 0 to 2pi --> 0 to 1
-        hue /= 2.0f * (float)Math.PI;
+        hue = 1.0f - hue / (2.0f * (float)Math.PI);
         
-        return HSLtoRGB(hue, 1.0f, 0.5f);
+        if (modarg < 0)
+        {
+            lightness = 0.75f - (float)super.abs() / 2.0f;
+        }
+        else
+        {
+            if ((int)modarg % 2 == 0) //If whole part of modarg is even, 0 --> 1 maps to black --> white
+                    lightness = (modarg - (float)Math.floor(modarg)) / 2.0f + 0.25f;
+            else //If whole part of modarg is odd 0 --> 1 maps to white --> black
+                    lightness = 0.75f - (modarg - (float)Math.floor(modarg)) / 2.0f;
+        }
+        
+        return HLtoRGB(hue, lightness);
     }
     
-
-    private static Color HSLtoRGB(float h, float s, float l)
+    /**
+     * Converts HSL model to RGB, synonymous with the kernel HSLtoRGB conversion. Uses a default value of 1.0f for saturation.
+     * @param h hue
+     * @param l lightness
+     * @return the color in RGB format
+     */
+    private static Color HLtoRGB(float h, float l)
     {
 
             //  Formula needs all values between 0 - 1.
 
-            //h = h % 360.0f;
 
             float q = l < 0.5 ? l*2 : 1;
 
@@ -150,15 +196,63 @@ public class Complex extends org.apache.commons.math3.complex.Complex
     private static String myConvert(double val)
     {
         DecimalFormat form;
+        String str, ans = "";
         
         if (val > 1e7 || val < -1e7)
             form = new DecimalFormat("0.####E0");
         else
             form = new DecimalFormat("######0.####");
         
-        return form.format(val);
+        str = form.format(val);
+        
+        for (int i = 0; i < str.length(); ++i)
+        {
+            switch (str.charAt(i)) {
+                case '\uFFFD':
+                    ans += "NaN";
+                    break;
+                case '\u221E':
+                    ans += "infinity";
+                    break;
+                default:
+                    ans += str.charAt(i);
+                    break;
+            }
+        }
+        
+        return ans;
     }
     
+    /**
+     * Uses the default String.valueOf command to get exact, accurate
+     * representation of the complex number.
+     * @return the complex number as a string (most accurate)
+     */
+    public String toAccurateString()
+    {
+        if (getImaginary() == 0.0) //If the number is real
+            return String.valueOf(getReal());
+            
+        if (getReal() == 0.0) //If the number is exclusively imaginary
+            return String.valueOf(getImaginary()) + "*i";
+        
+        return String.valueOf(getReal()) + (getImaginary() < 0 ? " - " : " + ") + (Math.abs(getImaginary()) == 1 ? "i" : (String.valueOf(Math.abs(getImaginary())) + "*i"));
+    }
+    
+    /**
+     * Gets the complex number as a string, represented as polar coordinates.
+     * @return the complex number as a string (polar coordinates)
+     */
+    public String toPolarString()
+    {
+        return myConvert(abs()) + "\u2220" + myConvert(getArgument());
+    }
+    
+    /**
+     * Gets the string representation of the complex number, using the double to 
+     * string conversion used in myConvert function.
+     * @return the complex number as a string
+     */
     @Override
     public String toString()
     {

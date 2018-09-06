@@ -1,10 +1,10 @@
 - Allow user to prioritise speed (CLPlatform.DeviceFeature.MaxComputeUnits) or prioritise accuracy (CLPlatform.DeviceFeature.DoubleSupport) (imoplement as togglable button on toolbar, with stopwatch icon)
 - Add code to select between float and double in host (check via CLContext.isDoubleSupported())
-- Update domain colouring algorithm in ComplexColor.Java to match OpenCL kernel domain colouring
 - Add asinh, acosh and atanh functions to Complex class
-- Investigate "(z + i)*(z-1)" issue
-- find offending operator when throwing InvalidOperatorUseException exception
+- Find offending operator when throwing InvalidOperatorUseException exception
 - Fix java.lang.IllegalStateException issue with MenuPane 
 - Add tooltip text to buttons. Add menu items and tooltiptext for them too
-- Handle +/- infinity, and +/0 zero (NaN?)
 - Allow accurate values for Complex components in calculator
+- Finish complex functions in C Kernel
+- Adjust MainFrame minimum size
+- Fix rediculous resizing and auto scaling in CanvasPane

@@ -50,9 +50,9 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="MenuPane" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="CanvasPane" max="32767" attributes="0"/>
+              <Component id="CanvasPane" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="StatusPane" min="-2" max="-2" attributes="0"/>
+              <Component id="StatusPane" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -83,22 +83,22 @@
                   <Component id="btnZoomIn" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnZoomOut" min="-2" pref="30" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="1408" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="btnNew" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnSave" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnPan" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnZoom" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnNewton" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnCalculate" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnUndo" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnRedo" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnZoomIn" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnZoomOut" min="-2" pref="28" max="-2" attributes="0"/>
+              <Component id="btnNew" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+              <Component id="btnSave" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+              <Component id="btnPan" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+              <Component id="btnZoom" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+              <Component id="btnNewton" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+              <Component id="btnCalculate" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+              <Component id="btnUndo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+              <Component id="btnRedo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+              <Component id="btnZoomIn" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+              <Component id="btnZoomOut" alignment="0" pref="0" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -206,16 +206,21 @@
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="CanvasPane">
+      <Properties>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="99" green="99" red="ff" type="rgb"/>
+        </Property>
+      </Properties>
 
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="1762" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="924" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="938" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -231,34 +236,32 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="lblFz" min="-2" pref="170" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jLabel2" min="-2" pref="102" max="-2" attributes="0"/>
+                  <Component id="lblPolar" min="-2" pref="170" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jLabel1" min="-2" pref="102" max="-2" attributes="0"/>
+                  <Component id="lblColor" min="-2" pref="15" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="lblFz" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="lblZ" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                          <Component id="lblPolar" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblFz" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblZ" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="lblColor" alignment="0" min="-2" pref="16" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="0" pref="4" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabel1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="jLabel1"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabel2">
+        <Component class="javax.swing.JLabel" name="lblPolar">
           <Properties>
             <Property name="text" type="java.lang.String" value="jLabel1"/>
           </Properties>
@@ -271,6 +274,16 @@
         <Component class="javax.swing.JLabel" name="lblZ">
           <Properties>
             <Property name="text" type="java.lang.String" value="jLabel1"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblColor">
+          <Properties>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+                <LineBorder/>
+              </Border>
+            </Property>
+            <Property name="opaque" type="boolean" value="true"/>
           </Properties>
         </Component>
       </SubComponents>

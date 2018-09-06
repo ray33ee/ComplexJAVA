@@ -1,3 +1,8 @@
+Version 1.1.11
+    - Fixed bug where complex values with magnitude around 1e153 were overflowing
+    - Javadoc updated
+    - PI related constants use built in OpenCL constants (see real.h)
+
 Version 1.1.10
     - Right associativity bug fixed
     - Ownership of _history transfered from MainFrame to ComplexComponent

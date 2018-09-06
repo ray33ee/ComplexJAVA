@@ -41,6 +41,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         lblZ.setText("");
         lblFz.setText("");
+        lblPolar.setText("");
         
         CanvasPane.add(_canvas);
     }
@@ -49,14 +50,23 @@ public class MainFrame extends javax.swing.JFrame {
     public void paint(java.awt.Graphics g) 
     { 
         if (_canvas != null && CanvasPane != null)
+        {
             _canvas.setSize( CanvasPane.getWidth() - 20 , CanvasPane.getHeight() - 0); 
+        }
         super.paint(g); 
     }
     
+    /**
+     * This function is called by the ComplexComponent widget in the mouse move event.
+     * @param val 
+     */
     public void onTrace(Complex val)
     {
         lblZ.setText(val.toString());
-        lblFz.setText(_canvas.getLandscape().getEvaluator().f(val).toString());
+        Complex result = _canvas.getLandscape().getEvaluator().f(val);
+        lblFz.setText(result.toString());
+        lblColor.setBackground(result.color());
+        lblPolar.setText(result.toPolarString());
     }
     
     /**
@@ -87,10 +97,10 @@ public class MainFrame extends javax.swing.JFrame {
         btnZoomOut = new javax.swing.JButton();
         CanvasPane = new javax.swing.JPanel();
         StatusPane = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        lblPolar = new javax.swing.JLabel();
         lblFz = new javax.swing.JLabel();
         lblZ = new javax.swing.JLabel();
+        lblColor = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -191,7 +201,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(btnZoomIn, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(1408, 1408, 1408))
         );
         MenuPaneLayout.setVerticalGroup(
             MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -204,27 +214,30 @@ public class MainFrame extends javax.swing.JFrame {
             .addComponent(btnUndo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addComponent(btnRedo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addComponent(btnZoomIn, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
+
+        CanvasPane.setBackground(new java.awt.Color(255, 153, 153));
 
         javax.swing.GroupLayout CanvasPaneLayout = new javax.swing.GroupLayout(CanvasPane);
         CanvasPane.setLayout(CanvasPaneLayout);
         CanvasPaneLayout.setHorizontalGroup(
             CanvasPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1762, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         CanvasPaneLayout.setVerticalGroup(
             CanvasPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 924, Short.MAX_VALUE)
+            .addGap(0, 938, Short.MAX_VALUE)
         );
 
-        jLabel1.setText("jLabel1");
-
-        jLabel2.setText("jLabel1");
+        lblPolar.setText("jLabel1");
 
         lblFz.setText("jLabel1");
 
         lblZ.setText("jLabel1");
+
+        lblColor.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        lblColor.setOpaque(true);
 
         javax.swing.GroupLayout StatusPaneLayout = new javax.swing.GroupLayout(StatusPane);
         StatusPane.setLayout(StatusPaneLayout);
@@ -236,20 +249,22 @@ public class MainFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblFz, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblPolar, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblColor, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         StatusPaneLayout.setVerticalGroup(
             StatusPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(StatusPaneLayout.createSequentialGroup()
-                .addGroup(StatusPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(lblFz)
-                    .addComponent(lblZ))
-                .addGap(0, 4, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, StatusPaneLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(StatusPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(StatusPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblPolar)
+                        .addComponent(lblFz)
+                        .addComponent(lblZ))
+                    .addComponent(lblColor, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         jMenu1.setText("File");
@@ -273,9 +288,9 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(MenuPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(CanvasPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(CanvasPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(StatusPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(StatusPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -341,12 +356,12 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnZoom;
     private javax.swing.JButton btnZoomIn;
     private javax.swing.JButton btnZoomOut;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JLabel lblColor;
     private javax.swing.JLabel lblFz;
+    private javax.swing.JLabel lblPolar;
     private javax.swing.JLabel lblZ;
     // End of variables declaration//GEN-END:variables
 }
