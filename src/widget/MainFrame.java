@@ -50,9 +50,7 @@ public class MainFrame extends javax.swing.JFrame {
     public void paint(java.awt.Graphics g) 
     { 
         if (_canvas != null && CanvasPane != null)
-        {
             _canvas.setSize( CanvasPane.getWidth() - 20 , CanvasPane.getHeight() - 0); 
-        }
         super.paint(g); 
     }
     
@@ -95,6 +93,7 @@ public class MainFrame extends javax.swing.JFrame {
         btnZoomIn = new javax.swing.JButton();
         btnCalculate = new javax.swing.JButton();
         btnZoomOut = new javax.swing.JButton();
+        tglSpeed = new javax.swing.JToggleButton();
         CanvasPane = new javax.swing.JPanel();
         StatusPane = new javax.swing.JPanel();
         lblPolar = new javax.swing.JLabel();
@@ -177,6 +176,13 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        tglSpeed.setText("jToggleButton1");
+        tglSpeed.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tglSpeedActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout MenuPaneLayout = new javax.swing.GroupLayout(MenuPane);
         MenuPane.setLayout(MenuPaneLayout);
         MenuPaneLayout.setHorizontalGroup(
@@ -201,20 +207,28 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(btnZoomIn, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(1408, 1408, 1408))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(tglSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         MenuPaneLayout.setVerticalGroup(
             MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnNew, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnPan, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnZoom, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnNewton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnCalculate, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnUndo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnRedo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnZoomIn, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MenuPaneLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(tglSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(MenuPaneLayout.createSequentialGroup()
+                .addGap(4, 4, 4)
+                .addGroup(MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnNew, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnPan, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnZoom, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnNewton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCalculate, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnUndo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRedo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnZoomIn, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         CanvasPane.setBackground(new java.awt.Color(255, 153, 153));
@@ -227,7 +241,7 @@ public class MainFrame extends javax.swing.JFrame {
         );
         CanvasPaneLayout.setVerticalGroup(
             CanvasPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 938, Short.MAX_VALUE)
+            .addGap(0, 960, Short.MAX_VALUE)
         );
 
         lblPolar.setText("jLabel1");
@@ -342,6 +356,11 @@ public class MainFrame extends javax.swing.JFrame {
         _canvas.centerZoom(1.0);
     }//GEN-LAST:event_btnZoomOutActionPerformed
 
+    private void tglSpeedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglSpeedActionPerformed
+     
+        _canvas.prioritiseSpeed(tglSpeed.isSelected());
+    }//GEN-LAST:event_tglSpeedActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel CanvasPane;
     private javax.swing.JPanel MenuPane;
@@ -363,5 +382,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel lblFz;
     private javax.swing.JLabel lblPolar;
     private javax.swing.JLabel lblZ;
+    private javax.swing.JToggleButton tglSpeed;
     // End of variables declaration//GEN-END:variables
 }

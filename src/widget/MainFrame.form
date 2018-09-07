@@ -83,22 +83,33 @@
                   <Component id="btnZoomIn" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnZoomOut" min="-2" pref="30" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="1408" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="tglSpeed" min="-2" pref="27" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="btnNew" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnSave" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnPan" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnZoom" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnNewton" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnCalculate" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnUndo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnRedo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnZoomIn" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-              <Component id="btnZoomOut" alignment="0" pref="0" max="32767" attributes="0"/>
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="tglSpeed" min="-2" pref="26" max="-2" attributes="0"/>
+              </Group>
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="btnNew" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnSave" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnPan" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnZoom" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnNewton" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnCalculate" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnUndo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnRedo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnZoomIn" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnZoomOut" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -203,6 +214,14 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnZoomOutActionPerformed"/>
           </Events>
         </Component>
+        <Component class="javax.swing.JToggleButton" name="tglSpeed">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="jToggleButton1"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tglSpeedActionPerformed"/>
+          </Events>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="CanvasPane">
@@ -220,7 +239,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="938" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="960" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>

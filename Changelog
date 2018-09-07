@@ -1,3 +1,8 @@
+Version 1.1.12
+    - Trig and inverse trig functions implemented in C kernel and java Evaluator
+    - prioritiseSpeed function added to ComplexComponent to facilitate selection between speed and accuracy
+    - Kernel is now passed double/floating values depending on support
+
 Version 1.1.11
     - Fixed bug where complex values with magnitude around 1e153 were overflowing
     - Javadoc updated
@@ -27,7 +32,7 @@ Version 1.1.7
 
 Version 1.1.6
     - Main JFrame now implemented via MainFrame class.
-    - Various wawrnings and issues fixed
+    - Various warnings and issues fixed
 
 Version 1.1.5
     - Evaluator setString now complete, converts string formula into tokenlist

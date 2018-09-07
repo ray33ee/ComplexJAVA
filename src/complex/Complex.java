@@ -15,6 +15,11 @@ import java.text.DecimalFormat;
  */
 public class Complex extends org.apache.commons.math3.complex.Complex
 {
+    public static final Complex ONE;
+    public static final Complex I;
+    
+    static { ONE = new Complex(1,0); I = new Complex(0,1); }
+    
     public Complex() { super(0); }
     
     public Complex(double real) { super(real); }
@@ -29,8 +34,7 @@ public class Complex extends org.apache.commons.math3.complex.Complex
     
     public Complex multiply(Complex z) { return new Complex(super.multiply(z)); }
     
-    @Override
-    public Complex multiply(double r) { return new Complex(super.multiply(r)); }
+    @Override public Complex multiply(double r) { return new Complex(super.multiply(r)); }
     
     public Complex divide(Complex z) { return new Complex(super.divide(z)); }
     
@@ -60,17 +64,29 @@ public class Complex extends org.apache.commons.math3.complex.Complex
     
     @Override public Complex tan() { return new Complex(super.tan()); }
     
-    public Complex asinh() { return new Complex(super.asin()); }
+    public Complex asinh() { return add(sqrd().add(ONE).sqrt()).ln(); }
     
-    public Complex acosh() { return new Complex(super.acos()); }
+    public Complex acosh() { return add(sqrd().subtract(ONE).sqrt()).ln(); }
     
-    public Complex atanh() { return new Complex(super.atan()); }
+    public Complex atanh() { return add(ONE).divide(ONE.subtract(this)).ln().multiply(0.5); }
     
     @Override public Complex sinh() { return new Complex(super.sinh()); }
     
     @Override public Complex cosh() { return new Complex(super.cosh()); }
     
     @Override public Complex tanh() { return new Complex(super.tanh()); }
+    
+    @Override public Complex reciprocal() { return new Complex(super.reciprocal()); }
+    
+    /**
+     * Gets the complex number this multiplied by itself. The square of a+bi is calculated as
+     * (a+bi)^2 = (a^2 - b^2) + (2ab)i.
+     * @return this * this
+     */
+    public Complex sqrd() 
+    {  
+        return new Complex(getReal() * getReal() - getImaginary() * getImaginary(), 2*getReal() * getImaginary());
+    }
     
     
     /**
@@ -169,20 +185,11 @@ public class Complex extends org.apache.commons.math3.complex.Complex
 
             if (h > 1 ) h -= 1;
 
-            if (6 * h < 1)
-            {
-                    return p + ((q - p) * 6 * h);
-            }
+            if (6 * h < 1) return p + ((q - p) * 6 * h); 
 
-            if (2 * h < 1 )
-            {
-                    return  q;
-            }
+            if (2 * h < 1 ) return  q;
 
-            if (3 * h < 2)
-            {
-                    return p + ( (q - p) * 6 * ((2.0f / 3.0f) - h) );
-            }
+            if (3 * h < 2) return p + ( (q - p) * 6 * ((2.0f / 3.0f) - h) );
 
             return p;
     }

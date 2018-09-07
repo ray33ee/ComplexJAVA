@@ -26,17 +26,27 @@ struct ARGB ARGB_constructor(unsigned char r, unsigned char g, unsigned char b)
     return col;
 }
 
+/**
+ * Structure representing complex number
+ */
 struct Complex
 {
+    /**
+     * Real component of complex number, a in a+bi
+     */
     real re;
+    
+    /**
+     * Imaginary component of complex number, b in a+bi
+     */
     real im;
 };
 
 struct Token
 {
-    float re;
-    float im;
-    float type;
+    real re;
+    real im;
+    real type;
 };
 
 real c_abs(struct Complex);
@@ -55,22 +65,12 @@ float  HueToRGB(float , float , float );
  * @param im imaginary component
  * @return Complex number re + im*i
  */
-struct Complex c_complexc(real re, real im)
+inline struct Complex c_complex(real re, real im)
 {
     struct Complex ans;
     ans.re = re;
     ans.im = im;
     return ans;
-}
-
-/**
- * Constructs a complex number with real part only
- * @param re real component
- * @return Re as complex number re + 0*i
- */
-struct Complex c_complexr(real re)
-{
-    return c_complexc(re, 0);
 }
 
 /**
@@ -81,10 +81,7 @@ struct Complex c_complexr(real re)
  */
 struct Complex c_add(struct Complex z, struct Complex w)
 {
-    struct Complex ans;
-    ans.re = z.re + w.re;
-    ans.im = z.im + w.im;
-    return ans;
+    return c_complex(z.re + w.re, z.im + w.im);
 }
 
 /**
@@ -95,10 +92,7 @@ struct Complex c_add(struct Complex z, struct Complex w)
  */
 struct Complex c_sub(struct Complex z, struct Complex w)
 {
-    struct Complex ans;
-    ans.re = z.re - w.re;
-    ans.im = z.im - w.im;
-    return ans;
+    return c_complex(z.re - w.re, z.im - w.im);
 }
 
 /**
@@ -109,10 +103,38 @@ struct Complex c_sub(struct Complex z, struct Complex w)
  */
 struct Complex c_mul(struct Complex z, struct Complex w)
 {
-    struct Complex ans;
-    ans.re = z.re * w.re - z.im * w.im;
-    ans.im = z.re * w.im + z.im * w.re;
-    return ans;
+    return c_complex(z.re * w.re - z.im * w.im, z.re * w.im + z.im * w.re);
+}
+
+/**
+ * Gets the complex number multiplied by the imaginary unit, i.
+ * @param z multiplicand
+ * @return z*i
+ */
+inline struct Complex c_muli(struct Complex z)
+{
+    return c_complex(-z.im, z.re);
+}
+
+/**
+ * Gets the complex number multiplied by -i.
+ * @param z multiplicand
+ * @return z*-i
+ */
+inline struct Complex c_mulni(struct Complex z)
+{
+    return c_complex(z.im, -z.re);
+}
+
+/**
+ * Gets the complex number multiplied by scalar factor.
+ * @param z Complex number
+ * @param f Scalar factor
+ * @return z*f
+ */
+inline struct Complex c_mulr(struct Complex z, real f)
+{
+    return c_complex(z.re * f, z.im * f);
 }
 
 /**
@@ -123,11 +145,8 @@ struct Complex c_mul(struct Complex z, struct Complex w)
  */
 struct Complex c_div(struct Complex z, struct Complex w)
 {
-    struct Complex ans;
-    real sumsq = w.re * w.re + w.im * w.im;
-    ans.re = (z.re * w.re + z.im * w.im) / sumsq;
-    ans.im = (z.im * w.re - z.re * w.im) / sumsq;
-    return ans;
+    double sumsq = w.re * w.re + w.im * w.im;
+    return c_complex((z.re * w.re + z.im * w.im) / sumsq, (z.im * w.re - z.re * w.im) / sumsq);
 }
 
 /**
@@ -162,10 +181,7 @@ struct Complex c_log(struct Complex z, struct Complex w)
  */
 struct Complex c_neg(struct Complex z)
 {
-    struct Complex ans;
-    ans.re = -z.re;
-    ans.im = -z.im;
-    return ans;
+    return c_complex(-z.re, -z.im);
 }
 
 /**
@@ -175,10 +191,7 @@ struct Complex c_neg(struct Complex z)
  */
 struct Complex c_conj(struct Complex z)
 {
-    struct Complex ans;
-    ans.re = z.re;
-    ans.im = -z.im;
-    return ans;
+    return c_complex(z.re, -z.im);
 }
 
 /**
@@ -188,13 +201,27 @@ struct Complex c_conj(struct Complex z)
  * @return the square root of z
  */
 struct Complex c_sqrt(struct Complex z)
-{
-    struct Complex ans;
-    real squirt = sqrt(sqrt(z.re * z.re + z.im * z.im) + z.re);
-    ans.re = squirt / R_PI_2;
-    ans.im = z.im / (squirt * R_PI_2);
-    return ans;
+{    
+    if (z.re == 0.0 && z.im == 0.0)
+        return c_complex(0.0, 0.0);
+
+    double t = sqrt((fabs((real)z.re) + c_abs(z)) / 2.0);
+    if (z.re >= 0.0)
+        return c_complex(t, z.im / (2.0 * t));
+    else 
+        return c_complex(fabs(z.im) / (2.0 * t), copysign((real)1.0, z.im) * t);
 };
+
+/**
+ * Gets the complex number squared, z^2. Calculated as 
+ * (a+bi)^2 = a^2-b^2 + 2abi.
+ * @param z the number to square
+ * @return z^2
+ */
+struct Complex c_sqrd(struct Complex z)
+{
+    return c_complex(z.re * z.re - z.im * z.im, 2*z.re*z.im);
+}
 
 /**
  * Gets the natural logarithm of the complex number
@@ -203,10 +230,7 @@ struct Complex c_sqrt(struct Complex z)
  */
 struct Complex c_ln(struct Complex z)
 {
-    struct Complex ans;
-    ans.re = log(c_abs(z));
-    ans.im = c_arg(z);
-    return ans;
+    return c_complex(log(c_abs(z)), c_arg(z));
 }
 
 /**
@@ -217,42 +241,39 @@ struct Complex c_ln(struct Complex z)
  */
 struct Complex c_exp(struct Complex z)
 {
-    struct Complex ans;
-    ans.re = exp(z.re) * cos(z.im);
-    ans.im = exp(z.re) * sin(z.im);
-    return ans;
+    return c_complex(exp(z.re) * cos(z.im), exp(z.re) * sin(z.im));
 }
 
-struct Complex c_sinh(struct Complex z) { return c_complexc(-1, -1); }
+struct Complex c_sinh(struct Complex z) { return c_complex(sinh(z.re)*cos(z.im), cosh(z.re)*sin(z.im)); }
 
-struct Complex c_cosh(struct Complex z) { return c_complexc(-1, -1); }
+struct Complex c_cosh(struct Complex z) { return c_complex(cosh(z.re)*cos(z.im), sinh(z.re)*sin(z.im)); }
 
-struct Complex c_tanh(struct Complex z) { return c_complexc(-1, -1); }
+struct Complex c_tanh(struct Complex z) { double denom = cosh(2*z.re)+cos(2*z.im); return c_complex(sinh(2*z.re) / denom, sin(2*z.im) / denom); }
 
-struct Complex c_sin(struct Complex z) { return c_complexc(-1, -1); }
+struct Complex c_sin(struct Complex z) { return c_complex(sin(z.re)*cosh(z.im), cos(z.re)*sinh(z.im)); }
 
-struct Complex c_cos(struct Complex z) { return c_complexc(-1, -1); }
+struct Complex c_cos(struct Complex z) { return c_complex(cos(z.re)*cosh(z.im), -sin(z.re)*sinh(z.im)); }
 
-struct Complex c_tan(struct Complex z) { return c_complexc(-1, -1); }
+struct Complex c_tan(struct Complex z) { double denom = cos(2*z.re)+cosh(2*z.im); return c_complex(sin(2*z.re) / denom, sinh(2*z.im) / denom); }
 
-struct Complex c_asinh(struct Complex z) { return c_complexc(-1, -1); }
+struct Complex c_asinh(struct Complex z) { return c_ln(c_add(z, c_sqrt(c_add(c_sqrd(z), c_complex(1, 0))))); }
 
-struct Complex c_acosh(struct Complex z) { return c_complexc(-1, -1); }
+struct Complex c_acosh(struct Complex z) { return c_ln(c_add(z, c_sqrt(c_sub(c_sqrd(z), c_complex(1, 0))))); }
 
-struct Complex c_atanh(struct Complex z) { return c_complexc(-1, -1); }
+struct Complex c_atanh(struct Complex z) { return c_complex(-1, -1); }
 
-struct Complex c_asin(struct Complex z) { return c_complexc(-1, -1); }
+struct Complex c_asin(struct Complex z) { return c_mulni(c_ln(c_add(c_mul(c_sqrt(c_sub(c_complex(1, 0), z)),c_sqrt(c_add(c_complex(1, 0), z))),c_muli(z)))); } 
 
-struct Complex c_acos(struct Complex z) { return c_complexc(-1, -1); }
+struct Complex c_acos(struct Complex z) { return c_mulni(c_ln(c_add(z, c_muli(c_mul(c_sqrt(c_sub(c_complex(1, 0), z)),c_sqrt(c_add(c_complex(1, 0), z))))))); }
 
-struct Complex c_atan(struct Complex z) { return c_complexc(-1, -1); }
+struct Complex c_atan(struct Complex z) { return c_mulr(c_muli(c_ln(c_div(c_add(c_complex(0, 1),z),c_sub(c_complex(0, 1),z)))), 0.5); }
 
 /**
  * Function gets the absolute value of the complex number
  * @param z the complex number
  * @return the absolute value of the complex number z, |z|.
  */
-real c_abs(struct Complex z) { return  hypot(z.re, z.im); }
+real c_abs(struct Complex z) { return hypot(z.re, z.im); }
 
 /**
  * Function gets the argument of the complex number
@@ -450,10 +471,10 @@ struct Complex evaluate(__global struct Token* tokens, __global struct Complex* 
                         stack[pointer-area] = c_atan(stack[pointer-area]);
                         break;
                     case 23:
-                        stack[pointer-area] = c_complexr(c_abs(stack[pointer-area]));
+                        stack[pointer-area] = c_complex(c_abs(stack[pointer-area]), 0.0);
                         break;
                     case 24:
-                        stack[pointer-area] = c_complexr(c_arg(stack[pointer-area]));
+                        stack[pointer-area] = c_complex(c_arg(stack[pointer-area]), 0.0);
                         break;
                 }
                 break;

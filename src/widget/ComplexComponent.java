@@ -12,6 +12,7 @@ import java.awt.image.DataBufferInt;
 import javax.swing.JComponent;
 
 import com.nativelibs4java.opencl.*;
+import com.nativelibs4java.opencl.CLPlatform.DeviceFeature;
 import com.nativelibs4java.util.*;
 import complex.Complex;
 import complex.History;
@@ -41,7 +42,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     private final int REALS_PER_COMPLEX = 2;
     
     private CLContext   _context;
-    private final CLKernel    _kernel;
+    private CLKernel    _kernel;
     private CLQueue     _queue;
     
     /**
@@ -77,9 +78,6 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         //Add first landscape, using a default Evaluator
         _history.add(new Landscape(new Evaluator(), new Complex(-10,-10), new Complex(10,10)));
         
-        //Find the best context
-        _context = JavaCL.createBestContext(CLPlatform.DeviceFeature.DoubleSupport);
-        
         //Set the default action to pan
         _action = ActionType.PAN; 
         
@@ -87,6 +85,31 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         _press = new Complex();
 
         _parent = parent;
+        
+        prioritiseSpeed(false);
+
+        
+            
+        super.addMouseMotionListener(this);
+        super.addMouseListener(this);
+    }
+    
+    /**
+     * Changes the priority of the OpenCL device selection from fast to oaccurate. If priority is speed,
+     * JavaCL will select the fastest context available. If accuracy is the chosen priority, the fastest
+     * context with double precision support is chosen.
+     * @param fast choose true to prioritise speed
+     */
+    public void prioritiseSpeed(boolean fast)
+    {
+        DeviceFeature df; 
+        
+        if (fast)
+            df = DeviceFeature.MaxComputeUnits;
+        else
+            df = DeviceFeature.DoubleSupport;
+        
+        _context = JavaCL.createBestContext(df);
         
         _queue = _context.createDefaultQueue();
         
@@ -102,14 +125,12 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         CLProgram program = _context.createProgram(src);
         program.addInclude("/include/");
         _kernel = program.createKernel("get_landscape");
-
+        
+        
         //Display all devices in the selected context
-        System.out.println("Using device(s)...");
+        System.out.println("Prioritising " + (fast ? "speed" : "accuracy") + ", displaying chosen device(s)...");
         for (int i = 0; i < _context.getDevices().length; ++i)
             System.out.println("    " + _context.getDevices()[i].getName());
-            
-        super.addMouseMotionListener(this);
-        super.addMouseListener(this);
     }
     
     /**
@@ -176,6 +197,8 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
      * @param a 
      */
     public void setAction(ActionType a) { _action = a; }
+    
+    
     
     /**
      * Get the current landscape on display
@@ -250,20 +273,39 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         //Get a copy of the token list
         Token[] list = _history.getCurrent().getEvaluator().getTokens();
         
-        //Token list is implemented as a list of floats. Each group of three floats represents real, imaginary and type of a token
-        Pointer<Float> tokenPtr = allocateFloats(list.length * 3); //.order(_context.getByteOrder());
-        
-        //Copy tokens
-        for (int i = 0; i < list.length; ++i)
+        CLBuffer tokenBuff;
+        if (_context.isDoubleSupported()) //_context.isDoubleSupported()
         {
-            tokenPtr.set(3*i, (float)list[i].getData().getReal());
-            tokenPtr.set(3*i+1, (float)list[i].getData().getImaginary());
-            tokenPtr.set(3*i+2, (float)list[i].getInt());
+            //Token list is implemented as a list of floats. Each group of three floats represents real, imaginary and type of a token
+            Pointer<Double> tokenPtr = allocateDoubles(list.length * 3); //.order(_context.getByteOrder());
+
+            //Copy tokens
+            for (int i = 0; i < list.length; ++i)
+            {
+                tokenPtr.set(3*i, list[i].getData().getReal());
+                tokenPtr.set(3*i+1, list[i].getData().getImaginary());
+                tokenPtr.set(3*i+2, (double)list[i].getInt());
+            }
+
+            //Create input buffer for token list
+            tokenBuff = _context.createDoubleBuffer(CLMem.Usage.Input, tokenPtr);
         }
-        
-        //Create input buffer for token list
-        CLBuffer<Float> tokenBuff = _context.createFloatBuffer(CLMem.Usage.Input, tokenPtr);
-        
+        else
+        {
+            //Token list is implemented as a list of floats. Each group of three floats represents real, imaginary and type of a token
+            Pointer<Float> tokenPtr = allocateFloats(list.length * 3); //.order(_context.getByteOrder());
+
+            //Copy tokens
+            for (int i = 0; i < list.length; ++i)
+            {
+                tokenPtr.set(3*i, (float)list[i].getData().getReal());
+                tokenPtr.set(3*i+1, (float)list[i].getData().getImaginary());
+                tokenPtr.set(3*i+2, (float)list[i].getInt());
+            }
+
+            //Create input buffer for token list
+            tokenBuff = _context.createFloatBuffer(CLMem.Usage.Input, tokenPtr);
+        }
         // Create output buffer for colour array :
         CLBuffer<Integer> outbuff = _context.createIntBuffer(CLMem.Usage.Output, getArea());
         
@@ -275,7 +317,20 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
             stackbuff = _context.createFloatBuffer(CLMem.Usage.Output, getArea() * _history.getCurrent().getEvaluator().getStackMax() * REALS_PER_COMPLEX);
         
         // Get and call the kernel : max.imag and min.imag have been swapped because 0,0 (which is top left) should be bottom 
-        _kernel.setArgs(
+        if (_context.isDoubleSupported())
+        {
+            _kernel.setArgs(
+                tokenBuff, stackbuff,
+                list.length,
+                _history.getCurrent().getMinDomain().getReal(), 
+                _history.getCurrent().getMaxDomain().getImaginary(), 
+                (_history.getCurrent().getMaxDomain().getReal() - _history.getCurrent().getMinDomain().getReal()), 
+                (_history.getCurrent().getMinDomain().getImaginary() - _history.getCurrent().getMaxDomain().getImaginary()),
+                getWidth(), getHeight(), outbuff, getArea(), _history.getCurrent().getEvaluator().getStackMax());
+        }
+        else
+        {
+            _kernel.setArgs(
                 tokenBuff, stackbuff,
                 list.length,
                 (float)_history.getCurrent().getMinDomain().getReal(), 
@@ -283,7 +338,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
                 (float)(_history.getCurrent().getMaxDomain().getReal() - _history.getCurrent().getMinDomain().getReal()), 
                 (float)(_history.getCurrent().getMinDomain().getImaginary() - _history.getCurrent().getMaxDomain().getImaginary()),
                 getWidth(), getHeight(), outbuff, getArea(), _history.getCurrent().getEvaluator().getStackMax());
-        
+        }
         int[] globalSizes = new int[] { getWidth(), getHeight() };
         
         //Send kernel to event queue
