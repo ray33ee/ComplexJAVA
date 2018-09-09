@@ -1,3 +1,10 @@
+Version 1.1.13
+    - Infuriating resizing bug fixed
+    - myConvert was not displaying doubles with a small magnitude in standard form. This has been fixed
+    - Macro constants (C_ZERO, C_ONE, etc.) added to complex.h
+    - Complex infinity and NaN propagated properly
+    - Complex.toString now correctly displays +/- i.
+
 Version 1.1.12
     - Trig and inverse trig functions implemented in C kernel and java Evaluator
     - prioritiseSpeed function added to ComplexComponent to facilitate selection between speed and accuracy

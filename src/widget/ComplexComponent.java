@@ -69,14 +69,14 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
      * Construct Complex component and initialise JComponent and member variables.
      * @param parent the parent of the Component
      */
-    public ComplexComponent(MainFrame parent)
+    public ComplexComponent(Landscape first, MainFrame parent)
     {
         super();
         
         _history = new History();
         
         //Add first landscape, using a default Evaluator
-        _history.add(new Landscape(new Evaluator(), new Complex(-10,-10), new Complex(10,10)));
+        _history.add(first);
         
         //Set the default action to pan
         _action = ActionType.PAN; 
@@ -88,8 +88,6 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         
         prioritiseSpeed(false);
 
-        
-            
         super.addMouseMotionListener(this);
         super.addMouseListener(this);
     }

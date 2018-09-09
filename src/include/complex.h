@@ -1,6 +1,16 @@
 
 #include "real.h"
 
+/* Yes I know I'm going to hell for using #defines...*/
+#define C_ZERO (c_complex(0,0))
+#define C_ONE (c_complex(1, 0))
+#define C_MINUS_ONE (c_complex(-1, 0))
+#define C_I (c_complex(0, 1))
+#define C_MINUS_I (c_complex(0, -1))
+#define C_NAN (c_complex(NAN, NAN))
+#define C_INF (c_complex(INFINITY, INFINITY))
+
+/** Struct representing a 32-bit colour*/
 struct ARGB
 {
     unsigned char b;
@@ -26,19 +36,10 @@ struct ARGB ARGB_constructor(unsigned char r, unsigned char g, unsigned char b)
     return col;
 }
 
-/**
- * Structure representing complex number
- */
 struct Complex
 {
-    /**
-     * Real component of complex number, a in a+bi
-     */
     real re;
     
-    /**
-     * Imaginary component of complex number, b in a+bi
-     */
     real im;
 };
 
@@ -58,6 +59,12 @@ struct Complex c_exp(struct Complex);
 struct Complex c_ln(struct Complex);
 
 float  HueToRGB(float , float , float );
+
+inline bool isNaN(struct Complex z) { return isnan(z.re) || isnan(z.im); }
+
+inline bool isInf(struct Complex z) { return (isinf(z.re) || isinf(z.im)) && !isNaN(z); }
+
+inline bool isZero(struct Complex z) { return z.re == 0.0 && z.im == 0.0; }
 
 /**
  * Constructs a complex number with real and imaginary parts
@@ -81,6 +88,8 @@ inline struct Complex c_complex(real re, real im)
  */
 struct Complex c_add(struct Complex z, struct Complex w)
 {
+    if (isNaN(z) || isNaN(w))
+        return C_NAN;
     return c_complex(z.re + w.re, z.im + w.im);
 }
 
@@ -92,6 +101,8 @@ struct Complex c_add(struct Complex z, struct Complex w)
  */
 struct Complex c_sub(struct Complex z, struct Complex w)
 {
+    if (isNaN(z) || isNaN(w))
+        return C_NAN;
     return c_complex(z.re - w.re, z.im - w.im);
 }
 
@@ -103,6 +114,12 @@ struct Complex c_sub(struct Complex z, struct Complex w)
  */
 struct Complex c_mul(struct Complex z, struct Complex w)
 {
+    if (isNaN(z) || isNaN(w)) 
+        return C_NAN; 
+    
+    if (isInf(z) || isNaN(w))
+        return C_INF;
+    
     return c_complex(z.re * w.re - z.im * w.im, z.re * w.im + z.im * w.re);
 }
 
@@ -113,6 +130,12 @@ struct Complex c_mul(struct Complex z, struct Complex w)
  */
 inline struct Complex c_muli(struct Complex z)
 {
+    if (isNaN(z)) 
+        return C_NAN; 
+    
+    if (isInf(z))
+        return C_INF;
+    
     return c_complex(-z.im, z.re);
 }
 
@@ -123,6 +146,12 @@ inline struct Complex c_muli(struct Complex z)
  */
 inline struct Complex c_mulni(struct Complex z)
 {
+    if (isNaN(z)) 
+        return C_NAN; 
+    
+    if (isInf(z))
+        return C_INF;
+    
     return c_complex(z.im, -z.re);
 }
 
@@ -134,6 +163,12 @@ inline struct Complex c_mulni(struct Complex z)
  */
 inline struct Complex c_mulr(struct Complex z, real f)
 {
+    if (isNaN(z) || isnan(f)) 
+        return C_NAN; 
+    
+    if (isInf(z) || isinf(f))
+        return C_INF;
+    
     return c_complex(z.re * f, z.im * f);
 }
 
@@ -145,6 +180,15 @@ inline struct Complex c_mulr(struct Complex z, real f)
  */
 struct Complex c_div(struct Complex z, struct Complex w)
 {
+    if (isNaN(z) || isNaN(w))
+        return C_NAN;
+    
+    if (isZero(w))
+        return C_INF;
+    
+    if (!isInf(z) && isInf(w))
+        return C_ZERO;
+    
     double sumsq = w.re * w.re + w.im * w.im;
     return c_complex((z.re * w.re + z.im * w.im) / sumsq, (z.im * w.re - z.re * w.im) / sumsq);
 }
@@ -181,6 +225,9 @@ struct Complex c_log(struct Complex z, struct Complex w)
  */
 struct Complex c_neg(struct Complex z)
 {
+    if (isNaN(z))
+        return C_NAN; 
+    
     return c_complex(-z.re, -z.im);
 }
 
@@ -191,6 +238,9 @@ struct Complex c_neg(struct Complex z)
  */
 struct Complex c_conj(struct Complex z)
 {
+    if (isNaN(z))
+        return C_NAN;
+    
     return c_complex(z.re, -z.im);
 }
 
@@ -202,8 +252,11 @@ struct Complex c_conj(struct Complex z)
  */
 struct Complex c_sqrt(struct Complex z)
 {    
-    if (z.re == 0.0 && z.im == 0.0)
-        return c_complex(0.0, 0.0);
+    if (isNaN(z))
+        return C_NAN;
+    
+    if (isZero(z))
+        return C_ZERO;
 
     double t = sqrt((fabs((real)z.re) + c_abs(z)) / 2.0);
     if (z.re >= 0.0)
@@ -220,6 +273,9 @@ struct Complex c_sqrt(struct Complex z)
  */
 struct Complex c_sqrd(struct Complex z)
 {
+    if (isNaN(z))
+        return C_NAN;
+    
     return c_complex(z.re * z.re - z.im * z.im, 2*z.re*z.im);
 }
 
@@ -230,6 +286,9 @@ struct Complex c_sqrd(struct Complex z)
  */
 struct Complex c_ln(struct Complex z)
 {
+    if (isZero(z))
+        return C_INF;
+    
     return c_complex(log(c_abs(z)), c_arg(z));
 }
 
@@ -241,39 +300,94 @@ struct Complex c_ln(struct Complex z)
  */
 struct Complex c_exp(struct Complex z)
 {
+    if (isNaN(z)) 
+        return C_NAN; 
+    
     return c_complex(exp(z.re) * cos(z.im), exp(z.re) * sin(z.im));
 }
 
-struct Complex c_sinh(struct Complex z) { return c_complex(sinh(z.re)*cos(z.im), cosh(z.re)*sin(z.im)); }
+struct Complex c_sinh(struct Complex z) { if (isNaN(z)) return C_NAN; return c_complex(sinh(z.re)*cos(z.im), cosh(z.re)*sin(z.im)); }
 
-struct Complex c_cosh(struct Complex z) { return c_complex(cosh(z.re)*cos(z.im), sinh(z.re)*sin(z.im)); }
+struct Complex c_cosh(struct Complex z) { if (isNaN(z)) return C_NAN; return c_complex(cosh(z.re)*cos(z.im), sinh(z.re)*sin(z.im)); }
 
-struct Complex c_tanh(struct Complex z) { double denom = cosh(2*z.re)+cos(2*z.im); return c_complex(sinh(2*z.re) / denom, sin(2*z.im) / denom); }
+struct Complex c_tanh(struct Complex z) 
+{ 
+    if (isNaN(z)) 
+        return C_NAN; 
+    
+    if (z.re > 20)
+        return C_ONE;
+    if (z.re < 20)
+        return C_MINUS_ONE;
+    
+    double twore = 2.0*z.re;
+    double twoim = 2.0*z.im;
+    double denom = cosh(twore)+cos(twoim); 
+    return c_complex(sinh(twore) / denom, sin(twoim) / denom); }
 
-struct Complex c_sin(struct Complex z) { return c_complex(sin(z.re)*cosh(z.im), cos(z.re)*sinh(z.im)); }
+struct Complex c_sin(struct Complex z) { if (isNaN(z)) return C_NAN; return c_complex(sin(z.re)*cosh(z.im), cos(z.re)*sinh(z.im)); }
 
-struct Complex c_cos(struct Complex z) { return c_complex(cos(z.re)*cosh(z.im), -sin(z.re)*sinh(z.im)); }
+struct Complex c_cos(struct Complex z) { if (isNaN(z)) return C_NAN; return c_complex(cos(z.re)*cosh(z.im), -sin(z.re)*sinh(z.im)); }
 
-struct Complex c_tan(struct Complex z) { double denom = cos(2*z.re)+cosh(2*z.im); return c_complex(sin(2*z.re) / denom, sinh(2*z.im) / denom); }
+struct Complex c_tan(struct Complex z) 
+{ 
+    if (isNaN(z)) 
+        return C_NAN; 
+    
+    if (z.im > 20)
+        return C_I;
+    if (z.im < 20)
+        return C_MINUS_I;
+    
+    double twore = 2.0*z.re;
+    double twoim = 2.0*z.im;
+    double denom = cos(twore)+cosh(twoim); 
+    return c_complex(sin(twore) / denom, sinh(twoim) / denom); 
+}
 
-struct Complex c_asinh(struct Complex z) { return c_ln(c_add(z, c_sqrt(c_add(c_sqrd(z), c_complex(1, 0))))); }
+struct Complex c_asinh(struct Complex z) { if (isNaN(z)) return C_NAN; return c_ln(c_add(z, c_sqrt(c_add(c_sqrd(z), C_ONE)))); }
 
-struct Complex c_acosh(struct Complex z) { return c_ln(c_add(z, c_sqrt(c_sub(c_sqrd(z), c_complex(1, 0))))); }
+struct Complex c_acosh(struct Complex z) { if (isNaN(z)) return C_NAN; return c_ln(c_add(z, c_sqrt(c_sub(c_sqrd(z), C_ONE)))); }
 
-struct Complex c_atanh(struct Complex z) { return c_complex(-1, -1); }
+struct Complex c_atanh(struct Complex z) 
+{ 
+    if (isNaN(z)) 
+        return C_NAN; 
+    return c_mulr(c_ln(c_div(c_add(C_ONE, z), c_sub(C_ONE, z))), 0.5); 
+}
 
-struct Complex c_asin(struct Complex z) { return c_mulni(c_ln(c_add(c_mul(c_sqrt(c_sub(c_complex(1, 0), z)),c_sqrt(c_add(c_complex(1, 0), z))),c_muli(z)))); } 
+struct Complex c_asin(struct Complex z) 
+{ 
+    if (isNaN(z)) 
+        return C_NAN; 
+    return c_mulni(c_ln(c_add(c_mul(c_sqrt(c_sub(C_ONE, z)),c_sqrt(c_add(C_ONE, z))),c_muli(z)))); 
+} 
 
-struct Complex c_acos(struct Complex z) { return c_mulni(c_ln(c_add(z, c_muli(c_mul(c_sqrt(c_sub(c_complex(1, 0), z)),c_sqrt(c_add(c_complex(1, 0), z))))))); }
+struct Complex c_acos(struct Complex z) { if (isNaN(z)) return C_NAN; return c_mulni(c_ln(c_add(z, c_muli(c_mul(c_sqrt(c_sub(C_ONE, z)),c_sqrt(c_add(C_ONE, z))))))); }
 
-struct Complex c_atan(struct Complex z) { return c_mulr(c_muli(c_ln(c_div(c_add(c_complex(0, 1),z),c_sub(c_complex(0, 1),z)))), 0.5); }
+struct Complex c_atan(struct Complex z) 
+{ 
+    if (isNaN(z)) 
+        return C_NAN; 
+    
+    return c_mulr(c_muli(c_ln(c_div(c_add(C_I,z),c_sub(C_I,z)))), 0.5); 
+}
 
 /**
  * Function gets the absolute value of the complex number
  * @param z the complex number
  * @return the absolute value of the complex number z, |z|.
  */
-real c_abs(struct Complex z) { return hypot(z.re, z.im); }
+real c_abs(struct Complex z) 
+{ 
+    if (isNaN(z)) 
+        return NAN; 
+    
+    if (isInf(z)) 
+        return INFINITY; 
+    
+    return hypot(z.re, z.im); 
+}
 
 /**
  * Function gets the argument of the complex number
@@ -323,7 +437,7 @@ struct ARGB c_colour(struct Complex z)
 {
     
     //If z is zero, or contains a NaN component display as white
-    if ((z.re == 0.0 && z.im == 0.0) || isnan(z.re) || isnan(z.im) )
+    if (isZero(z) || isNaN(z) )
         return ARGB_constructor (255, 255, 255);
 
     //Both components are +/-inf
@@ -340,7 +454,7 @@ struct ARGB c_colour(struct Complex z)
     }
 
     //Either one, or the other component is +/1 inf
-    if (isinf(z.re) || isinf(z.im))
+    if (isInf(z))
     {
         if (isinf(z.re) && z.re > 0)
             return ARGB_constructor (255, 0, 0) ;
@@ -479,8 +593,8 @@ struct Complex evaluate(__global struct Token* tokens, __global struct Complex* 
                 }
                 break;
             case 3:
-                stack[pointer].re = (real)tokens[cnt].re;
-                stack[pointer].im = (real)tokens[cnt].im;
+                stack[pointer].re = tokens[cnt].re;
+                stack[pointer].im = tokens[cnt].im;
                 pointer += area;
                 break;
         }

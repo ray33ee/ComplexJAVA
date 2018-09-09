@@ -26,7 +26,7 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         
         //Initialise ComplexComponent with first landscape
-        _canvas = new ComplexComponent(this);
+        _canvas = new ComplexComponent(new complex.Landscape(new complex.evaluator.Evaluator(), new Complex(-1e100,-1e100), new Complex(1e100,1e100)), this);
         
         //Setup physical attributes for ComplexComponent and frame
         _canvas.setLayout(new BorderLayout());
@@ -35,7 +35,6 @@ public class MainFrame extends javax.swing.JFrame {
         super.setDefaultCloseOperation(EXIT_ON_CLOSE);
         super.setSize(1800, 1000);
         
-        super.setMinimumSize(new java.awt.Dimension (200, 200));
         
         initComponents();
         
@@ -50,7 +49,9 @@ public class MainFrame extends javax.swing.JFrame {
     public void paint(java.awt.Graphics g) 
     { 
         if (_canvas != null && CanvasPane != null)
-            _canvas.setSize( CanvasPane.getWidth() - 20 , CanvasPane.getHeight() - 0); 
+        {
+            _canvas.setSize( CanvasPane.getWidth() - 20 , CanvasPane.getHeight() - 10);
+        } 
         super.paint(g); 
     }
     
@@ -105,6 +106,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(610, 580));
 
         btnNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/new.png"))); // NOI18N
         btnNew.addActionListener(new java.awt.event.ActionListener() {
@@ -177,6 +179,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         tglSpeed.setText("jToggleButton1");
+        tglSpeed.setToolTipText("Click to prioritise speed");
         tglSpeed.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tglSpeedActionPerformed(evt);
@@ -231,8 +234,6 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
-        CanvasPane.setBackground(new java.awt.Color(255, 153, 153));
-
         javax.swing.GroupLayout CanvasPaneLayout = new javax.swing.GroupLayout(CanvasPane);
         CanvasPane.setLayout(CanvasPaneLayout);
         CanvasPaneLayout.setHorizontalGroup(
@@ -258,7 +259,7 @@ public class MainFrame extends javax.swing.JFrame {
         StatusPaneLayout.setHorizontalGroup(
             StatusPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, StatusPaneLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(1340, Short.MAX_VALUE)
                 .addComponent(lblZ, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblFz, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -302,9 +303,9 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(MenuPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(CanvasPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(CanvasPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(StatusPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(StatusPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -359,6 +360,11 @@ public class MainFrame extends javax.swing.JFrame {
     private void tglSpeedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglSpeedActionPerformed
      
         _canvas.prioritiseSpeed(tglSpeed.isSelected());
+        
+        if (tglSpeed.isSelected())
+            tglSpeed.setToolTipText("Click to prioritise accuracy");
+        else
+            tglSpeed.setToolTipText("Click to prioritise speed");
     }//GEN-LAST:event_tglSpeedActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

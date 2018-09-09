@@ -205,7 +205,7 @@ public class Complex extends org.apache.commons.math3.complex.Complex
         DecimalFormat form;
         String str, ans = "";
         
-        if (val > 1e7 || val < -1e7)
+        if (val > 1e7 || val < -1e7 || (val > -1e-4 && val < 1e-4) && val != 0)
             form = new DecimalFormat("0.####E0");
         else
             form = new DecimalFormat("######0.####");
@@ -241,7 +241,7 @@ public class Complex extends org.apache.commons.math3.complex.Complex
             return String.valueOf(getReal());
             
         if (getReal() == 0.0) //If the number is exclusively imaginary
-            return String.valueOf(getImaginary()) + "*i";
+            return Math.abs(getImaginary()) == 1.0 ? (getImaginary() < 0 ? "-i" : "i") : (String.valueOf(getImaginary()) + "*i");
         
         return String.valueOf(getReal()) + (getImaginary() < 0 ? " - " : " + ") + (Math.abs(getImaginary()) == 1 ? "i" : (String.valueOf(Math.abs(getImaginary())) + "*i"));
     }
@@ -267,8 +267,8 @@ public class Complex extends org.apache.commons.math3.complex.Complex
             return myConvert(getReal());
             
         if (getReal() == 0.0) //If the number is exclusively imaginary
-            return myConvert(getImaginary()) + "*i";
+            return Math.abs(getImaginary()) == 1.0 ? (getImaginary() < 0 ? "-i" : "i") : (myConvert(getImaginary()) + "*i");
         
-        return myConvert(getReal()) + (getImaginary() < 0 ? " - " : " + ") + (Math.abs(getImaginary()) == 1 ? "i" : (myConvert(Math.abs(getImaginary())) + "*i"));
+        return myConvert(getReal()) + (getImaginary() < 0 ? " - " : " + ") + (Math.abs(getImaginary()) == 1.0 ? "i" : (myConvert(Math.abs(getImaginary())) + "*i"));
     }
 }

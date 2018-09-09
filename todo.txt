@@ -1,5 +1,4 @@
 - Find offending operator when throwing InvalidOperatorUseException exception
 - Add tooltip text to buttons. Add menu items and tooltiptext for them too
-- Adjust MainFrame minimum size
-- Fix rediculous resizing and auto scaling in CanvasPane
-- Make sure NaN and infinite are treated identically in C kernel and java evaluator
+- Thoroughly test all functions by sampling random values, checking colouring, and testing at and beyond double precision limits
+- Test input values in mindomain and maxdomain within dialog box for overflow (+/- infinity)
