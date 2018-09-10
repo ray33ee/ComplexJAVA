@@ -26,7 +26,7 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         
         //Initialise ComplexComponent with first landscape
-        _canvas = new ComplexComponent(new complex.Landscape(new complex.evaluator.Evaluator(), new Complex(-1e100,-1e100), new Complex(1e100,1e100)), this);
+        _canvas = new ComplexComponent(new complex.Landscape(new complex.evaluator.Evaluator(), new Complex(-1,-1), new Complex(1,1)), this);
         
         //Setup physical attributes for ComplexComponent and frame
         _canvas.setLayout(new BorderLayout());
@@ -95,6 +95,7 @@ public class MainFrame extends javax.swing.JFrame {
         btnCalculate = new javax.swing.JButton();
         btnZoomOut = new javax.swing.JButton();
         tglSpeed = new javax.swing.JToggleButton();
+        btnCenter = new javax.swing.JButton();
         CanvasPane = new javax.swing.JPanel();
         StatusPane = new javax.swing.JPanel();
         lblPolar = new javax.swing.JLabel();
@@ -106,9 +107,11 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Complex Grpaher");
         setMinimumSize(new java.awt.Dimension(610, 580));
 
         btnNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/new.png"))); // NOI18N
+        btnNew.setToolTipText("Create new landscape");
         btnNew.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNewActionPerformed(evt);
@@ -116,6 +119,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/save.png"))); // NOI18N
+        btnSave.setToolTipText("Save landscape as image");
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveActionPerformed(evt);
@@ -123,6 +127,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         btnPan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/pan.png"))); // NOI18N
+        btnPan.setToolTipText("Move around landscape");
         btnPan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnPanActionPerformed(evt);
@@ -130,6 +135,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         btnZoom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/zoom.png"))); // NOI18N
+        btnZoom.setToolTipText("Select zoom");
         btnZoom.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnZoomActionPerformed(evt);
@@ -137,6 +143,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         btnNewton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/newton.png"))); // NOI18N
+        btnNewton.setToolTipText("Root finder");
         btnNewton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNewtonActionPerformed(evt);
@@ -144,6 +151,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         btnUndo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/undo.png"))); // NOI18N
+        btnUndo.setToolTipText("Undo");
         btnUndo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnUndoActionPerformed(evt);
@@ -151,6 +159,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         btnRedo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/redo.png"))); // NOI18N
+        btnRedo.setToolTipText("Redo");
         btnRedo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRedoActionPerformed(evt);
@@ -158,6 +167,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         btnZoomIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/zoomin.png"))); // NOI18N
+        btnZoomIn.setToolTipText("Zoom in");
         btnZoomIn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnZoomInActionPerformed(evt);
@@ -165,6 +175,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         btnCalculate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/calculator.png"))); // NOI18N
+        btnCalculate.setToolTipText("Show calculator");
         btnCalculate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCalculateActionPerformed(evt);
@@ -172,6 +183,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         btnZoomOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/zoomout.png"))); // NOI18N
+        btnZoomOut.setToolTipText("Zoom out");
         btnZoomOut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnZoomOutActionPerformed(evt);
@@ -183,6 +195,13 @@ public class MainFrame extends javax.swing.JFrame {
         tglSpeed.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tglSpeedActionPerformed(evt);
+            }
+        });
+
+        btnCenter.setToolTipText("Center on zero");
+        btnCenter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCenterActionPerformed(evt);
             }
         });
 
@@ -207,31 +226,34 @@ public class MainFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRedo, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCenter, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnZoomIn, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tglSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         MenuPaneLayout.setVerticalGroup(
-            MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MenuPaneLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tglSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(MenuPaneLayout.createSequentialGroup()
-                .addGap(4, 4, 4)
+            MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, MenuPaneLayout.createSequentialGroup()
                 .addGroup(MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnNew, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnPan, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnZoom, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnNewton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnCalculate, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnUndo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnRedo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(btnCenter, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnNew, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnPan, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnZoom, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnNewton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnCalculate, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnUndo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnRedo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(btnZoomIn, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tglSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout CanvasPaneLayout = new javax.swing.GroupLayout(CanvasPane);
@@ -242,7 +264,7 @@ public class MainFrame extends javax.swing.JFrame {
         );
         CanvasPaneLayout.setVerticalGroup(
             CanvasPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 960, Short.MAX_VALUE)
+            .addGap(0, 964, Short.MAX_VALUE)
         );
 
         lblPolar.setText("jLabel1");
@@ -259,7 +281,7 @@ public class MainFrame extends javax.swing.JFrame {
         StatusPaneLayout.setHorizontalGroup(
             StatusPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, StatusPaneLayout.createSequentialGroup()
-                .addContainerGap(1340, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblZ, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblFz, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -367,11 +389,16 @@ public class MainFrame extends javax.swing.JFrame {
             tglSpeed.setToolTipText("Click to prioritise speed");
     }//GEN-LAST:event_tglSpeedActionPerformed
 
+    private void btnCenterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCenterActionPerformed
+        _canvas.zeroCenter();
+    }//GEN-LAST:event_btnCenterActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel CanvasPane;
     private javax.swing.JPanel MenuPane;
     private javax.swing.JPanel StatusPane;
     private javax.swing.JButton btnCalculate;
+    private javax.swing.JButton btnCenter;
     private javax.swing.JButton btnNew;
     private javax.swing.JButton btnNewton;
     private javax.swing.JButton btnPan;

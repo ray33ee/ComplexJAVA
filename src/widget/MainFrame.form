@@ -19,6 +19,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
+    <Property name="title" type="java.lang.String" value="Complex Grpaher"/>
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
       <Dimension value="[610, 580]"/>
     </Property>
@@ -52,9 +53,9 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <Component id="MenuPane" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="CanvasPane" max="32767" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="StatusPane" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -83,35 +84,39 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnRedo" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
+                  <Component id="btnCenter" min="-2" pref="30" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnZoomIn" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnZoomOut" min="-2" pref="30" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="tglSpeed" min="-2" pref="27" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="tglSpeed" min="-2" pref="26" max="-2" attributes="0"/>
-              </Group>
+          <Group type="103" groupAlignment="1" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="btnNew" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                      <Component id="btnSave" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                      <Component id="btnPan" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                      <Component id="btnZoom" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                      <Component id="btnNewton" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                      <Component id="btnCalculate" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                      <Component id="btnUndo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                      <Component id="btnRedo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Group type="103" alignment="0" groupAlignment="0" attributes="0">
+                          <Component id="btnCenter" alignment="1" min="-2" pref="28" max="-2" attributes="0"/>
+                          <Group type="103" alignment="1" groupAlignment="0" attributes="0">
+                              <Component id="btnNew" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                              <Component id="btnSave" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                              <Component id="btnPan" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                              <Component id="btnZoom" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                              <Component id="btnNewton" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                              <Component id="btnCalculate" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                              <Component id="btnUndo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                              <Component id="btnRedo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
                       <Component id="btnZoomIn" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
                       <Component id="btnZoomOut" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="tglSpeed" alignment="0" min="-2" pref="26" max="-2" attributes="0"/>
                   </Group>
+                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -122,6 +127,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/resources/toolbar/new.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Create new landscape"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnNewActionPerformed"/>
@@ -132,6 +138,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/resources/toolbar/save.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Save landscape as image"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSaveActionPerformed"/>
@@ -142,6 +149,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/resources/toolbar/pan.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Move around landscape"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPanActionPerformed"/>
@@ -152,6 +160,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/resources/toolbar/zoom.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Select zoom"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnZoomActionPerformed"/>
@@ -162,6 +171,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/resources/toolbar/newton.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Root finder"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnNewtonActionPerformed"/>
@@ -172,6 +182,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/resources/toolbar/undo.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Undo"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnUndoActionPerformed"/>
@@ -182,6 +193,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/resources/toolbar/redo.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Redo"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRedoActionPerformed"/>
@@ -192,6 +204,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/resources/toolbar/zoomin.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Zoom in"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnZoomInActionPerformed"/>
@@ -202,6 +215,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/resources/toolbar/calculator.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Show calculator"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCalculateActionPerformed"/>
@@ -212,6 +226,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/resources/toolbar/zoomout.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Zoom out"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnZoomOutActionPerformed"/>
@@ -226,6 +241,14 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tglSpeedActionPerformed"/>
           </Events>
         </Component>
+        <Component class="javax.swing.JButton" name="btnCenter">
+          <Properties>
+            <Property name="toolTipText" type="java.lang.String" value="Center on zero"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCenterActionPerformed"/>
+          </Events>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="CanvasPane">
@@ -238,7 +261,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="960" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="964" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -249,7 +272,7 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace pref="1340" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
                   <Component id="lblZ" min="-2" pref="170" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="lblFz" min="-2" pref="170" max="-2" attributes="0"/>

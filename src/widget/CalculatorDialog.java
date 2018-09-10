@@ -52,6 +52,7 @@ public class CalculatorDialog extends javax.swing.JDialog
         lblOutput = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
 
         txtInput.setText("jTextField1");
 

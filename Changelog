@@ -1,3 +1,8 @@
+Version 1.1.14
+    - FEATURE: Center on zero added
+    - BUG FIX: Center zoom no longer adds two entries per call to history
+    - FEATURE: Newton-raphson root finder and relevant exceptions added
+
 Version 1.1.13
     - Infuriating resizing bug fixed
     - myConvert was not displaying doubles with a small magnitude in standard form. This has been fixed

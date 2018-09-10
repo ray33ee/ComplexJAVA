@@ -38,6 +38,8 @@ public class Complex extends org.apache.commons.math3.complex.Complex
     
     public Complex divide(Complex z) { return new Complex(super.divide(z)); }
     
+    public Complex divide(double d) { return new Complex(super.divide(d)); }
+    
     public Complex pow(Complex z) { return new Complex(super.pow(z)); }
     
     public Complex log(Complex z) { return new Complex(super.log().divide(z.log())); }

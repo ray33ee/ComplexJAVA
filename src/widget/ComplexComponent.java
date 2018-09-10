@@ -23,10 +23,13 @@ import java.io.IOException;
 import complex.Token;
 import complex.Landscape;
 import complex.evaluator.Evaluator;
+import complex.exceptions.DivergentSeedException;
+import complex.exceptions.RootFinderException;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import javax.swing.JOptionPane;
 
 /**
  *  ComplexComponent is a widget responsible for painting complex landscapes and handling mouse events
@@ -131,6 +134,16 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
             System.out.println("    " + _context.getDevices()[i].getName());
     }
     
+    public void zeroCenter()
+    {
+        Complex min = _history.getCurrent().getMinDomain();
+        Complex max = _history.getCurrent().getMaxDomain();
+        
+        Complex diff = max.subtract(min).divide(2.0);
+        
+        changeLandscape(new Landscape(_history.getCurrent().getEvaluator(), diff.negate(), diff));
+    }
+    
     /**
      * Performs a zoom about the center of the landscape with the given factor
      * @param factor the zoom scale factor
@@ -144,8 +157,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         
         Landscape land = new Landscape(_history.getCurrent().getEvaluator(), min.subtract(diff.multiply(factor)), max.add(diff.multiply(factor)));
         
-        _history.add(land);
-        changeLandscape(_history.getCurrent());
+        changeLandscape(land);
     }
     
     /**
@@ -226,21 +238,18 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     @Override
     public void mouseReleased(MouseEvent e) 
     {
-        Complex release;
+        Complex release = trace(e.getPoint());;
         Landscape land;
         switch (_action)
         {
             case PAN:
-                release = trace(e.getPoint());
                 Complex movement = release.subtract(_press);
 
                 land = new Landscape(_history.getCurrent().getEvaluator(), _history.getCurrent().getMinDomain().subtract(movement),  _history.getCurrent().getMaxDomain().subtract(movement));
 
                 changeLandscape(land);
                 break;
-            case ZOOM:
-                release = trace(e.getPoint());
-                
+            case ZOOM:                
                 Complex min = new Complex (Math.min(_press.getReal(), release.getReal()), Math.min(_press.getImaginary(), release.getImaginary()));
                 Complex max = new Complex (Math.max(_press.getReal(), release.getReal()), Math.max(_press.getImaginary(), release.getImaginary()));
                 
@@ -249,7 +258,15 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
                 changeLandscape(land);
                 break;
             case NEWTON:
-                
+                try
+                {
+                    Complex root = _history.getCurrent().getEvaluator().newton_raphson(release);
+                    JOptionPane.showMessageDialog(this, "Root found at: " + root.toString(), "Input box error", JOptionPane.INFORMATION_MESSAGE);
+                }
+                catch (RootFinderException ex)
+                {
+                    JOptionPane.showMessageDialog(this, ex.getMessage(), "Root finder error", JOptionPane.ERROR_MESSAGE);
+                }
                 break;
         }
         

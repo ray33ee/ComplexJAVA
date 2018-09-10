@@ -11,7 +11,7 @@ package complex.evaluator.exceptions;
  */
 public abstract class EvaluatorParseException extends Exception 
 {
-    private String _token;
+    private final String _token;
     
     public EvaluatorParseException(String token) { super(); _token = token; }
     

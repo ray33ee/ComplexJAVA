@@ -11,6 +11,7 @@ import java.util.Stack;
 //import org.apache.commons.math3.complex.Complex;
 
 import complex.evaluator.exceptions.*;
+import complex.exceptions.*;
 import java.util.ArrayList;
 
 /**
@@ -224,7 +225,7 @@ public class Evaluator {
      * @param z the seed value for newton raphson
      * @return the most accurate approximation the computer can create
      */
-    public Complex newton_raphson(Complex z) { return nrm(z, TIMEOUT); }
+    public Complex newton_raphson(Complex z) throws DivergentSeedException, TimeoutException { return nrm(z, TIMEOUT); }
     
     /**
      * Recursive newton raphson function
@@ -232,16 +233,26 @@ public class Evaluator {
      * @param timeout the current timeout
      * @return the next approximation
      */
-    private Complex nrm(Complex zn, int timeout)
+    private Complex nrm(Complex zn, int timeout) throws DivergentSeedException, TimeoutException
     {
+        
         //Timeout for non-convergent cases
 	if (timeout-- == 0)
-		return zn;
+            throw new TimeoutException(zn, TIMEOUT - timeout);
+                
+        if (zn.getReal() == 0.0 && zn.getImaginary() == 0.0)
+            return new Complex();
+        
+        if (zn.isInfinite() || zn.isNaN())
+            throw new DivergentSeedException(zn, TIMEOUT - timeout);
 
 	Complex next = zn.subtract(f(zn).divide(fast_gradient(zn)));
+        
+        
+        System.out.println("Seed(" + (next.subtract(zn)).abs() + "): " + zn.toString());
 
-	if ((next.subtract(zn)).abs() < EPSILON)
-		return next;
+	/*if ((next.subtract(zn)).abs() < EPSILON)
+		return next;*/
 
 	return nrm(next, timeout);
     }
