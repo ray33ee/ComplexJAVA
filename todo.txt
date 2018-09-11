@@ -1,5 +1,4 @@
 - Find offending operator when throwing InvalidOperatorUseException exception
-- Add tooltip text to buttons. Add menu items and tooltiptext for them too
 - Thoroughly test all functions by sampling random values, checking colouring, and testing at and beyond double precision limits
 - Test and prevent input values in mindomain and maxdomain within dialog box for overflow (+/- infinity) and NaN
 - If values overflow in calculator, inform user value is too large to store (arbitrary precision maybe?)

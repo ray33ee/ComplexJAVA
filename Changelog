@@ -1,3 +1,11 @@
+Version 1.1.15
+    - CLEANUP: Menu bar removed
+    - FEATURE: Revert function added to ComplexComponent, history dialog implemented
+    - FEATURE: Tool tip texts added to history dialog button, and labels
+    -  DESIGN: Icon graphics touched up
+    - CLEANUP: Abstract modal class created, inherited by history and property dialogs
+
+
 Version 1.1.14
     - FEATURE: Center on zero added
     - BUG FIX: Center zoom no longer adds two entries per call to history

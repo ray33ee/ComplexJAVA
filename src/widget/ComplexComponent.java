@@ -56,7 +56,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     /**
      * History class responsible for keeping track of undo/redo history
      */
-    private History<Landscape> _history;
+    private final History<Landscape> _history;
     
     /**
      * Stores the complex value at the position where the user has initiated a mousePress event
@@ -70,6 +70,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     
     /**
      * Construct Complex component and initialise JComponent and member variables.
+     * @param first the first landscape to draw on creation
      * @param parent the parent of the Component
      */
     public ComplexComponent(Landscape first, MainFrame parent)
@@ -77,9 +78,6 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         super();
         
         _history = new History();
-        
-        //Add first landscape, using a default Evaluator
-        _history.add(first);
         
         //Set the default action to pan
         _action = ActionType.PAN; 
@@ -89,11 +87,38 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
 
         _parent = parent;
         
+        //Add first landscape, using a default Evaluator
+        changeLandscape(first);
+        
         prioritiseSpeed(false);
 
         super.addMouseMotionListener(this);
         super.addMouseListener(this);
     }
+    
+    /**
+     * Get the area of the image, in pixels.
+     * @return the area, getWidth() * getHeight()
+     */
+    public int getArea() { return getWidth() * getHeight(); }
+    
+    /**
+     * Get the current landscape on display
+     * @return _landscape
+     */
+    public Landscape getLandscape() { return _history.getCurrent(); }
+    
+    /**
+     * Get the current history
+     * @return the history object
+     */
+    public History getHistory() { return _history; }
+    
+    /**
+     * Set the action for the component, either pan, zoom or newton/raphson method
+     * @param a 
+     */
+    public void setAction(ActionType a) { _action = a; }
     
     /**
      * Changes the priority of the OpenCL device selection from fast to oaccurate. If priority is speed,
@@ -169,6 +194,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         {
             _history.undo();
             repaint();
+            _parent.landscapeChange(_history.getCurrent());
         }
     }
     
@@ -181,7 +207,15 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         {
             _history.redo();
             repaint();
+            _parent.landscapeChange(_history.getCurrent());
         }
+    }
+    
+    public void revert(int i)
+    {
+        _history.revert(i);
+        repaint();
+        _parent.landscapeChange(_history.getCurrent());
     }
     
     /**
@@ -197,30 +231,10 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     }
     
     /**
-     * Get the area of the image, in pixels.
-     * @return the area, getWidth() * getHeight()
-     */
-    public int getArea() { return getWidth() * getHeight(); }
-    
-    /**
-     * Set the action for the component, either pan, zoom or newton/raphson method
-     * @param a 
-     */
-    public void setAction(ActionType a) { _action = a; }
-    
-    
-    
-    /**
-     * Get the current landscape on display
-     * @return _landscape
-     */
-    public Landscape getLandscape() { return _history.getCurrent(); }
-    
-    /**
      * Set the current landscape
      * @param land the landscape to set to
      */
-    public void changeLandscape(Landscape land) { _history.add(land); super.repaint(); }
+    public void changeLandscape(Landscape land) { _history.add(land); super.repaint(); _parent.landscapeChange(land); }
     
     @Override
     public void mouseMoved(MouseEvent e)

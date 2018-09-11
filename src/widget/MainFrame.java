@@ -5,6 +5,9 @@
  */
 package widget;
 
+import widget.dialogs.CalculatorDialog;
+import widget.dialogs.HistoryDialog;
+import widget.dialogs.PropertyDialog;
 import complex.Complex;
 import java.awt.BorderLayout;
 
@@ -23,24 +26,26 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * Creates new MainFrame form
      */
-    public MainFrame() {
+    public MainFrame() 
+    {
+        initComponents();
+        
+        complex.Landscape land = new complex.Landscape(new complex.evaluator.Evaluator(), new Complex(-1,-1), new Complex(1,1));
         
         //Initialise ComplexComponent with first landscape
-        _canvas = new ComplexComponent(new complex.Landscape(new complex.evaluator.Evaluator(), new Complex(-1,-1), new Complex(1,1)), this);
+        _canvas = new ComplexComponent(land, this);
         
         //Setup physical attributes for ComplexComponent and frame
         _canvas.setLayout(new BorderLayout());
-        _canvas.setLocation(10, 10);
+        _canvas.setLocation(10, 6);
         
         super.setDefaultCloseOperation(EXIT_ON_CLOSE);
         super.setSize(1800, 1000);
         
-        
-        initComponents();
-        
         lblZ.setText("");
         lblFz.setText("");
         lblPolar.setText("");
+        lblLandscape.setText(land.toString());
         
         CanvasPane.add(_canvas);
     }
@@ -66,6 +71,15 @@ public class MainFrame extends javax.swing.JFrame {
         lblFz.setText(result.toString());
         lblColor.setBackground(result.color());
         lblPolar.setText(result.toPolarString());
+    }
+    
+    /**
+     * Function called by the ComplexComponent anytime the landscape changes 
+     * @param land the new landscape
+     */
+    public void landscapeChange(complex.Landscape land)
+    {
+        lblLandscape.setText(land.toString());
     }
     
     /**
@@ -96,15 +110,14 @@ public class MainFrame extends javax.swing.JFrame {
         btnZoomOut = new javax.swing.JButton();
         tglSpeed = new javax.swing.JToggleButton();
         btnCenter = new javax.swing.JButton();
+        btnHistory = new javax.swing.JButton();
         CanvasPane = new javax.swing.JPanel();
         StatusPane = new javax.swing.JPanel();
         lblPolar = new javax.swing.JLabel();
         lblFz = new javax.swing.JLabel();
         lblZ = new javax.swing.JLabel();
         lblColor = new javax.swing.JLabel();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
+        lblLandscape = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Complex Grpaher");
@@ -166,7 +179,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        btnZoomIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/zoomin.png"))); // NOI18N
+        btnZoomIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/zoom_in.png"))); // NOI18N
         btnZoomIn.setToolTipText("Zoom in");
         btnZoomIn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -182,7 +195,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        btnZoomOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/zoomout.png"))); // NOI18N
+        btnZoomOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/zoom_out.png"))); // NOI18N
         btnZoomOut.setToolTipText("Zoom out");
         btnZoomOut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -190,7 +203,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        tglSpeed.setText("jToggleButton1");
+        tglSpeed.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/speed.png"))); // NOI18N
         tglSpeed.setToolTipText("Click to prioritise speed");
         tglSpeed.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -198,10 +211,19 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        btnCenter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/center.png"))); // NOI18N
         btnCenter.setToolTipText("Center on zero");
         btnCenter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCenterActionPerformed(evt);
+            }
+        });
+
+        btnHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/history.png"))); // NOI18N
+        btnHistory.setToolTipText("Show undo/redo history");
+        btnHistory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHistoryActionPerformed(evt);
             }
         });
 
@@ -225,6 +247,8 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(btnUndo, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRedo, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addComponent(btnHistory, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnCenter, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -237,56 +261,63 @@ public class MainFrame extends javax.swing.JFrame {
         );
         MenuPaneLayout.setVerticalGroup(
             MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, MenuPaneLayout.createSequentialGroup()
-                .addGroup(MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(btnCenter, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnNew, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnPan, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnZoom, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnNewton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnCalculate, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnUndo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnRedo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(btnZoomIn, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tglSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(btnCenter, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnNew, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnPan, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnZoom, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnNewton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCalculate, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnUndo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRedo, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(btnZoomIn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnZoomOut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(tglSpeed, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnHistory, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         javax.swing.GroupLayout CanvasPaneLayout = new javax.swing.GroupLayout(CanvasPane);
         CanvasPane.setLayout(CanvasPaneLayout);
         CanvasPaneLayout.setHorizontalGroup(
             CanvasPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 1414, Short.MAX_VALUE)
         );
         CanvasPaneLayout.setVerticalGroup(
             CanvasPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 964, Short.MAX_VALUE)
+            .addGap(0, 810, Short.MAX_VALUE)
         );
 
         lblPolar.setText("jLabel1");
+        lblPolar.setToolTipText("Polar coorinates at trace");
 
         lblFz.setText("jLabel1");
+        lblFz.setToolTipText("f(z) at graph trace");
 
         lblZ.setText("jLabel1");
+        lblZ.setToolTipText("Graph trace");
 
+        lblColor.setToolTipText("Colour at graph trace");
         lblColor.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         lblColor.setOpaque(true);
+
+        lblLandscape.setText("jLabel1");
+        lblLandscape.setToolTipText("Current equation, bottom left and top right coordinates");
 
         javax.swing.GroupLayout StatusPaneLayout = new javax.swing.GroupLayout(StatusPane);
         StatusPane.setLayout(StatusPaneLayout);
         StatusPaneLayout.setHorizontalGroup(
             StatusPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, StatusPaneLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblZ, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addComponent(lblLandscape, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblFz, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblZ, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblPolar, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblFz, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(lblPolar, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblColor, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -299,26 +330,19 @@ public class MainFrame extends javax.swing.JFrame {
                     .addGroup(StatusPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblPolar)
                         .addComponent(lblFz)
-                        .addComponent(lblZ))
+                        .addComponent(lblZ)
+                        .addComponent(lblLandscape))
                     .addComponent(lblColor, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addGap(37, 37, 37))
         );
-
-        jMenu1.setText("File");
-        jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
-
-        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(CanvasPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(StatusPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(MenuPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(CanvasPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -327,7 +351,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(CanvasPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(StatusPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(StatusPane, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -371,7 +395,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         PropertyDialog d = new PropertyDialog(this, _canvas.getLandscape());
         
-        if (d.isAccepted())
+        if (d.getAccepted())
             _canvas.changeLandscape(d.getLandscape());
     }//GEN-LAST:event_btnNewActionPerformed
 
@@ -393,12 +417,20 @@ public class MainFrame extends javax.swing.JFrame {
         _canvas.zeroCenter();
     }//GEN-LAST:event_btnCenterActionPerformed
 
+    private void btnHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistoryActionPerformed
+        HistoryDialog history = new HistoryDialog(this, _canvas.getHistory());
+        
+        if (history.getAccepted())
+            _canvas.revert(history.getChosen());
+    }//GEN-LAST:event_btnHistoryActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel CanvasPane;
     private javax.swing.JPanel MenuPane;
     private javax.swing.JPanel StatusPane;
     private javax.swing.JButton btnCalculate;
     private javax.swing.JButton btnCenter;
+    private javax.swing.JButton btnHistory;
     private javax.swing.JButton btnNew;
     private javax.swing.JButton btnNewton;
     private javax.swing.JButton btnPan;
@@ -408,11 +440,9 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnZoom;
     private javax.swing.JButton btnZoomIn;
     private javax.swing.JButton btnZoomOut;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JLabel lblColor;
     private javax.swing.JLabel lblFz;
+    private javax.swing.JLabel lblLandscape;
     private javax.swing.JLabel lblPolar;
     private javax.swing.JLabel lblZ;
     private javax.swing.JToggleButton tglSpeed;

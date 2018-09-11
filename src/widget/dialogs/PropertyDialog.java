@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package widget;
+package widget.dialogs;
 
 import complex.Landscape;
 import complex.Complex;
@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
  * Dialog prompting user for details of new landscape, that is the equation, minimum domain and maximum domain.
  * @author Will
  */
-public class PropertyDialog extends javax.swing.JDialog {
+public class PropertyDialog extends ModalDialog {
 
     /**
      * The Landscape stored in the dialog. When the dialog is created, the current landscape is 
@@ -24,28 +24,20 @@ public class PropertyDialog extends javax.swing.JDialog {
     private Landscape _landscape;
     
     /**
-     * True if the dialog was closed via an accept state (i.e. with ok)
-     */
-    private boolean _accepted;
-    
-    /**
      * Creates new form propertyDialog
      * @param parent sets parent of dialog
      * @param land the landscape to input into the text boxes
      */
-    public PropertyDialog(java.awt.Frame parent, Landscape land) {
-        super(parent, true);
+    public PropertyDialog(widget.MainFrame parent, Landscape land) {
+        super(parent, "New Landscape...");
         initComponents();
         
         _landscape = land;
-        _accepted = false;
         
         txtFormula.setText(land.getEvaluator().getEquation());
         txtMin.setText(land.getMinDomain().toString());
         txtMax.setText(land.getMaxDomain().toString());
         
-        super.setTitle("New Landscape...");
-        super.setLocation(parent.getX() + parent.getWidth() / 2 - super.getWidth() / 2, parent.getY() + parent.getHeight()/ 2 - super.getHeight()/ 2);
         super.setVisible(true);
     }
     
@@ -54,12 +46,6 @@ public class PropertyDialog extends javax.swing.JDialog {
      * @return the landscape
      */
     public Landscape getLandscape() { return _landscape; }
-    
-    /**
-     * Returns true if the dialog was closed via an accept button
-     * @return the accept
-     */
-    public boolean isAccepted() { return _accepted; }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -96,11 +82,14 @@ public class PropertyDialog extends javax.swing.JDialog {
             }
         });
 
+        txtFormula.setToolTipText("Equation/Expresion");
         jScrollPane1.setViewportView(txtFormula);
 
         txtMin.setText("1+i");
+        txtMin.setToolTipText("Bottom left coordinate");
 
         txtMax.setText("-1-i");
+        txtMax.setToolTipText("Top right coordinate");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -160,7 +149,7 @@ public class PropertyDialog extends javax.swing.JDialog {
             return;
         }
         
-        min = convert.f(new Complex(0));
+        min = convert.f(new Complex());
         
         //Convert maxdomain text to complex number, inform user of errors
         try
@@ -173,7 +162,7 @@ public class PropertyDialog extends javax.swing.JDialog {
             return;
         }
         
-        max = convert.f(new Complex(0));
+        max = convert.f(new Complex());
         
         //Convert formula text to token list, inform user of errors
         try
@@ -186,15 +175,11 @@ public class PropertyDialog extends javax.swing.JDialog {
             return;
         }
         
-        //Close dialog
-        _accepted = true;
-        dispose();
+        super.accept();
     }//GEN-LAST:event_btnOkActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        // TODO add your handling code here:
-        _accepted = false;
-        dispose();
+        super.reject();
     }//GEN-LAST:event_btnCancelActionPerformed
 
     

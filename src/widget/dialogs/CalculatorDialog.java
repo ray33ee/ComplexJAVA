@@ -3,12 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package widget;
+package widget.dialogs;
 
 import complex.Complex;
 import complex.evaluator.Evaluator;
 import complex.evaluator.exceptions.EvaluatorParseException;
 import javax.swing.JOptionPane;
+import widget.MainFrame;
 
 /**
  *
@@ -55,7 +56,9 @@ public class CalculatorDialog extends javax.swing.JDialog
         setResizable(false);
 
         txtInput.setText("jTextField1");
+        txtInput.setToolTipText("Input value");
 
+        lblColor.setToolTipText("Result colour");
         lblColor.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         lblColor.setOpaque(true);
 
@@ -73,11 +76,13 @@ public class CalculatorDialog extends javax.swing.JDialog
             }
         });
 
+        txtFormula.setToolTipText("Equation/expression");
         jScrollPane2.setViewportView(txtFormula);
 
         lblOutput.setBackground(new java.awt.Color(255, 255, 255));
         lblOutput.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         lblOutput.setText("jLabel1");
+        lblOutput.setToolTipText("Result");
         lblOutput.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(122, 138, 153)));
         lblOutput.setOpaque(true);
 

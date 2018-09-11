@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
-  <NonVisualComponents>
-    <Menu class="javax.swing.JMenuBar" name="jMenuBar1">
-      <SubComponents>
-        <Menu class="javax.swing.JMenu" name="jMenu1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="File"/>
-          </Properties>
-        </Menu>
-        <Menu class="javax.swing.JMenu" name="jMenu2">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Edit"/>
-          </Properties>
-        </Menu>
-      </SubComponents>
-    </Menu>
-  </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
     <Property name="title" type="java.lang.String" value="Complex Grpaher"/>
@@ -25,7 +9,6 @@
     </Property>
   </Properties>
   <SyntheticProperties>
-    <SyntheticProperty name="menuBar" type="java.lang.String" value="jMenuBar1"/>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
     <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
   </SyntheticProperties>
@@ -44,9 +27,9 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="CanvasPane" alignment="0" max="32767" attributes="0"/>
           <Component id="StatusPane" alignment="1" max="32767" attributes="0"/>
           <Component id="MenuPane" alignment="0" max="32767" attributes="0"/>
+          <Component id="CanvasPane" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -56,7 +39,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="CanvasPane" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="StatusPane" min="-2" max="-2" attributes="0"/>
+              <Component id="StatusPane" min="-2" pref="35" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -83,6 +66,8 @@
                   <Component id="btnUndo" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnRedo" min="-2" pref="30" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                  <Component id="btnHistory" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnCenter" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -97,27 +82,23 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="1" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="103" alignment="0" groupAlignment="0" attributes="0">
-                          <Component id="btnCenter" alignment="1" min="-2" pref="28" max="-2" attributes="0"/>
-                          <Group type="103" alignment="1" groupAlignment="0" attributes="0">
-                              <Component id="btnNew" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                              <Component id="btnSave" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                              <Component id="btnPan" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                              <Component id="btnZoom" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                              <Component id="btnNewton" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                              <Component id="btnCalculate" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                              <Component id="btnUndo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                              <Component id="btnRedo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
-                      <Component id="btnZoomIn" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                      <Component id="btnZoomOut" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                      <Component id="tglSpeed" alignment="0" min="-2" pref="26" max="-2" attributes="0"/>
+              <Group type="103" alignment="0" groupAlignment="0" attributes="0">
+                  <Component id="btnCenter" alignment="1" min="-2" pref="28" max="-2" attributes="0"/>
+                  <Group type="103" alignment="1" groupAlignment="0" attributes="0">
+                      <Component id="btnNew" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnSave" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnPan" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnZoom" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnNewton" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnCalculate" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnUndo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="btnRedo" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  <Component id="btnZoomIn" alignment="1" min="-2" pref="28" max="-2" attributes="0"/>
+                  <Component id="btnZoomOut" alignment="1" min="-2" pref="28" max="-2" attributes="0"/>
               </Group>
+              <Component id="tglSpeed" alignment="0" min="-2" pref="26" max="-2" attributes="0"/>
+              <Component id="btnHistory" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -202,7 +183,7 @@
         <Component class="javax.swing.JButton" name="btnZoomIn">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/resources/toolbar/zoomin.png"/>
+              <Image iconType="3" name="/resources/toolbar/zoom_in.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="Zoom in"/>
           </Properties>
@@ -224,7 +205,7 @@
         <Component class="javax.swing.JButton" name="btnZoomOut">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/resources/toolbar/zoomout.png"/>
+              <Image iconType="3" name="/resources/toolbar/zoom_out.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="Zoom out"/>
           </Properties>
@@ -234,7 +215,9 @@
         </Component>
         <Component class="javax.swing.JToggleButton" name="tglSpeed">
           <Properties>
-            <Property name="text" type="java.lang.String" value="jToggleButton1"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/resources/toolbar/speed.png"/>
+            </Property>
             <Property name="toolTipText" type="java.lang.String" value="Click to prioritise speed"/>
           </Properties>
           <Events>
@@ -243,10 +226,24 @@
         </Component>
         <Component class="javax.swing.JButton" name="btnCenter">
           <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/resources/toolbar/center.png"/>
+            </Property>
             <Property name="toolTipText" type="java.lang.String" value="Center on zero"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCenterActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnHistory">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/resources/toolbar/history.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Show undo/redo history"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnHistoryActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
@@ -256,12 +253,12 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="1414" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="964" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="810" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -272,12 +269,14 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace max="32767" attributes="0"/>
-                  <Component id="lblZ" min="-2" pref="170" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="lblFz" min="-2" pref="170" max="-2" attributes="0"/>
+                  <Component id="lblLandscape" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="lblPolar" min="-2" pref="170" max="-2" attributes="0"/>
+                  <Component id="lblZ" min="-2" pref="130" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="lblFz" min="-2" pref="130" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                  <Component id="lblPolar" min="-2" pref="140" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="lblColor" min="-2" pref="15" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -293,10 +292,11 @@
                           <Component id="lblPolar" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="lblFz" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="lblZ" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblLandscape" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Component id="lblColor" alignment="0" min="-2" pref="16" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -305,26 +305,36 @@
         <Component class="javax.swing.JLabel" name="lblPolar">
           <Properties>
             <Property name="text" type="java.lang.String" value="jLabel1"/>
+            <Property name="toolTipText" type="java.lang.String" value="Polar coorinates at trace"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="lblFz">
           <Properties>
             <Property name="text" type="java.lang.String" value="jLabel1"/>
+            <Property name="toolTipText" type="java.lang.String" value="f(z) at graph trace"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="lblZ">
           <Properties>
             <Property name="text" type="java.lang.String" value="jLabel1"/>
+            <Property name="toolTipText" type="java.lang.String" value="Graph trace"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="lblColor">
           <Properties>
+            <Property name="toolTipText" type="java.lang.String" value="Colour at graph trace"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
                 <LineBorder/>
               </Border>
             </Property>
             <Property name="opaque" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblLandscape">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="jLabel1"/>
+            <Property name="toolTipText" type="java.lang.String" value="Current equation, bottom left and top right coordinates"/>
           </Properties>
         </Component>
       </SubComponents>

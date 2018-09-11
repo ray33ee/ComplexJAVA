@@ -52,6 +52,6 @@ public class Landscape
     @Override
     public String toString() 
     {
-        return "(\"" + _evaltor.getEquation() + "\" " + _min.toString() + ", " + _max.toString() + ")";
+        return "f(z) = " + _evaltor.getEquation() + "    " + _min.toString() + "    " + _max.toString() + "";
     }
 }
