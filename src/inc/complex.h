@@ -1,6 +1,3 @@
-
-#include "real.h"
-
 /* Yes I know I'm going to hell for using #defines...*/
 #define C_ZERO (c_complex(0,0))
 #define C_ONE (c_complex(1, 0))
@@ -10,7 +7,7 @@
 #define C_NAN (c_complex(NAN, NAN))
 #define C_INF (c_complex(INFINITY, INFINITY))
 
-/** Struct representing a 32-bit colour*/
+/** 32-bit colour*/
 struct ARGB
 {
     unsigned char b;
@@ -19,30 +16,14 @@ struct ARGB
     unsigned char a;
 };
 
-/**
- * Constructs an empty ARGB structure
- * @param b blue component
- * @param g green component
- * @param r red component
- * @return the complete ARGB structure with A= 255. b occupies the lowest 8 bits, and a the highest 8 bits.
- */
-struct ARGB ARGB_constructor(unsigned char r, unsigned char g, unsigned char b)
-{
-    struct ARGB col;
-    col.a = 255;
-    col.r = r;
-    col.g = g;
-    col.b = b;
-    return col;
-}
-
+/** complex number */
 struct Complex
 {
     real re;
-    
     real im;
 };
 
+/** Token - see Token.java*/
 struct Token
 {
     real re;
@@ -58,13 +39,30 @@ struct Complex c_exp(struct Complex);
 
 struct Complex c_ln(struct Complex);
 
-float  HueToRGB(float , float , float );
+float HueToRGB(float, float, float);
 
 inline bool isNaN(struct Complex z) { return isnan(z.re) || isnan(z.im); }
 
 inline bool isInf(struct Complex z) { return (isinf(z.re) || isinf(z.im)) && !isNaN(z); }
 
 inline bool isZero(struct Complex z) { return z.re == 0.0 && z.im == 0.0; }
+
+/**
+ * Constructs an ARGB structure
+ * @param b blue component
+ * @param g green component
+ * @param r red component
+ * @return the complete ARGB structure with A= 255. b occupies the lowest 8 bits, and a the highest 8 bits.
+ */
+inline struct ARGB ARGB_constructor(unsigned char r, unsigned char g, unsigned char b)
+{
+    struct ARGB col;
+    col.a = 255;
+    col.r = r;
+    col.g = g;
+    col.b = b;
+    return col;
+}
 
 /**
  * Constructs a complex number with real and imaginary parts

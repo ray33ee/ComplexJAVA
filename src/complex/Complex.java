@@ -15,10 +15,8 @@ import java.text.DecimalFormat;
  */
 public class Complex extends org.apache.commons.math3.complex.Complex
 {
-    public static final Complex ONE;
-    public static final Complex I;
-    
-    static { ONE = new Complex(1,0); I = new Complex(0,1); }
+    public static final Complex ONE = new Complex(1,0);
+    public static final Complex I = new Complex(0,1);
     
     public Complex() { super(0); }
     
@@ -38,7 +36,7 @@ public class Complex extends org.apache.commons.math3.complex.Complex
     
     public Complex divide(Complex z) { return new Complex(super.divide(z)); }
     
-    public Complex divide(double d) { return new Complex(super.divide(d)); }
+    @Override public Complex divide(double d) { return new Complex(super.divide(d)); }
     
     public Complex pow(Complex z) { return new Complex(super.pow(z)); }
     
@@ -79,20 +77,20 @@ public class Complex extends org.apache.commons.math3.complex.Complex
     @Override public Complex tanh() { return new Complex(super.tanh()); }
     
     @Override public Complex reciprocal() { return new Complex(super.reciprocal()); }
+
+    @Override public boolean isNaN() { return super.isNaN(); }
+
+    @Override public boolean isInfinite() { return super.isInfinite(); }
     
     /**
      * Gets the complex number this multiplied by itself. The square of a+bi is calculated as
      * (a+bi)^2 = (a^2 - b^2) + (2ab)i.
      * @return this * this
      */
-    public Complex sqrd() 
-    {  
-        return new Complex(getReal() * getReal() - getImaginary() * getImaginary(), 2*getReal() * getImaginary());
-    }
-    
-    
+    public Complex sqrd() { return new Complex(getReal() * getReal() - getImaginary() * getImaginary(), 2*getReal() * getImaginary()); }
+        
     /**
-    * Gets the colour of this complex number, as per the domain colouring method
+     * Gets the colour of this complex number, as per the domain colouring method
      * @return  the colour of this complex number
      */
     public Color color()

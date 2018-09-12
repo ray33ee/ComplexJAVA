@@ -1,5 +1,5 @@
-#include "real.h"
-#include "complex.h"
+//#include "real.h"
+//#include "complex.h"
 
 __kernel void get_landscape(__global struct Token* tokens, __global struct Complex* stack, int token_count, real minRe, real minIm, real diffRe, real diffIm, int width, int height, __global struct ARGB* colours, int area, int stackmax) 
 {

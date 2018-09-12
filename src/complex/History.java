@@ -9,24 +9,25 @@ import java.util.ArrayList;
 
 /**
  * History class (as well as being a dry subject) contains the entire history in an 
- * recorded after any change, undo or redo initiated.
+ * recorded after any change, undo or redo initiated. Allows exposure of the underlying 
+ * array and a revert function to let user select an arbitrary event in history.
  * @author Will
  * @param <T> type of object in list
  */
 public class History<T>
 {
-    /**
-     * Variable responsible for storing usage history
-     */
+    /** Variable responsible for storing usage history */
     private  ArrayList<Object> _history;
     
-    /**
-     * pointer to next item
-     */
+    /** pointer to next item */
     private int _pointer;
     
     public History() { _history = new ArrayList<>(); _pointer = 0; }
     
+    /**
+     * Add item to history list
+     * @param val item/event to add to history
+     */
     public void add(T val) 
     {
         if (_pointer == _history.size())

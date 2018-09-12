@@ -8,7 +8,7 @@ package complex.exceptions;
 import complex.Complex;
 
 /**
- *
+ * Exception thrown when the root finder algorithm times out. The timeout value is defined in the Evaluator class.
  * @author Will
  */
 public class TimeoutException extends RootFinderException 

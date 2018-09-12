@@ -39,34 +39,51 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     
     enum ActionType { PAN, ZOOM, NEWTON };
     
-    /**
-     * The number of real numbers per complex number. Since this is always one real component and one imaginary component, this is always 2
-     */
+    /** The number of real numbers per complex number. Since this is always one real component and one imaginary component, this is always 2 */
     private final int REALS_PER_COMPLEX = 2;
     
     private CLContext   _context;
     private CLKernel    _kernel;
     private CLQueue     _queue;
     
-    /**
-     * Stores the action being used. Either Pan, zoom or newton raphson. 
-     */
+    /** Stores the action being used. Either Pan, zoom or newton raphson. */
     private ActionType _action;
     
-    /**
-     * History class responsible for keeping track of undo/redo history
-     */
+    /** History class responsible for keeping track of undo/redo history */
     private final History<Landscape> _history;
     
-    /**
-     * Stores the complex value at the position where the user has initiated a mousePress event
-     */
+    /** Stores the complex value at the position where the user has initiated a mousePress event */
     private Complex _press; 
     
-    /**
-     * Stores reference to parent object
-     */
+    /** Stores reference to parent object */
     private final MainFrame _parent;
+    
+    private static final String RealSource;
+    
+    private static final String ComplexSource;
+    
+    private static final String KernelSource;
+    
+    static
+    {
+        try
+        {
+            java.net.URL complexaddr = ComplexComponent.class.getResource("/inc/real.h");
+            java.net.URL realaddr = ComplexComponent.class.getResource("/inc/complex.h");
+            java.net.URL addr = ComplexComponent.class.getResource("/kernel/kernel.cl");
+            
+            if (addr == null || realaddr == null || complexaddr == null)
+                throw new Error("Exception at widget.ComplexComponent.prioritiseSpeed(), error \"" + new NullPointerException().toString() + "\". Could not find resource.");
+            
+            ComplexSource = IOUtils.readText(complexaddr);
+            RealSource = IOUtils.readText(realaddr);
+            KernelSource = IOUtils.readText(addr);
+        }
+        catch (IOException e)
+        {
+            throw new Error("IOException at widget.ComplexComponent.prioritiseSpeed(), error \"" + e.toString() + "\". Problem with accessing 'kernel.cl'.");
+        }
+    }
     
     /**
      * Construct Complex component and initialise JComponent and member variables.
@@ -121,7 +138,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     public void setAction(ActionType a) { _action = a; }
     
     /**
-     * Changes the priority of the OpenCL device selection from fast to oaccurate. If priority is speed,
+     * Changes the priority of the OpenCL device selection from fast to accurate. If priority is speed,
      * JavaCL will select the fastest context available. If accuracy is the chosen priority, the fastest
      * context with double precision support is chosen.
      * @param fast choose true to prioritise speed
@@ -139,19 +156,9 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         
         _queue = _context.createDefaultQueue();
         
-        String src = "";
-        try
-        {
-            src = IOUtils.readText(ComplexComponent.class.getResource("/kernel/kernel.cl"));
-        }
-        catch (IOException e)
-        {
-            System.err.println("IOException in widget.ComplexComponent.<init>()" + e.getMessage());
-        }
-        CLProgram program = _context.createProgram(src);
-        program.addInclude("/include/");
-        _kernel = program.createKernel("get_landscape");
+        CLProgram program = _context.createProgram(ComplexSource, RealSource, KernelSource);
         
+        _kernel = program.createKernel("get_landscape");
         
         //Display all devices in the selected context
         System.out.println("Prioritising " + (fast ? "speed" : "accuracy") + ", displaying chosen device(s)...");
@@ -159,6 +166,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
             System.out.println("    " + _context.getDevices()[i].getName());
     }
     
+    /** Center the current landscape on 0+0i, whilst preserving scale. */
     public void zeroCenter()
     {
         Complex min = _history.getCurrent().getMinDomain();
@@ -185,9 +193,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         changeLandscape(land);
     }
     
-    /**
-     * Revert to the last landscape
-     */
+    /** Revert to the last landscape */
     public void undo()
     {
         if (!_history.isAtBottom())
@@ -198,9 +204,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         }
     }
     
-    /**
-     * Revert to the previously undone landscape
-     */
+    /** Revert to the previously undone landscape */
     public void redo()
     {
         if (!_history.isAtTop())
@@ -211,6 +215,10 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         }
     }
     
+    /**
+     * Revert to the ith event in history
+     * @param i ith element to revert to
+     */
     public void revert(int i)
     {
         _history.revert(i);
@@ -275,7 +283,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
                 try
                 {
                     Complex root = _history.getCurrent().getEvaluator().newton_raphson(release);
-                    JOptionPane.showMessageDialog(this, "Root found at: " + root.toString(), "Input box error", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Root found at: " + root.toString() + " (" + root.toPolarString() + ")", "Input box error", JOptionPane.INFORMATION_MESSAGE);
                 }
                 catch (RootFinderException ex)
                 {

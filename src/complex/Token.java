@@ -24,25 +24,17 @@ public class Token extends Object {
      */
     public enum INSTRUCTION { EMPTY, VARIABLE, OPERATOR, CONSTANT }
     
-    /**
-     * Data in the token. This could be a constant or an index to a function
-     */
+    /** Data in the token. This could be a constant or an index to a function */
     private Complex     _data;
     
-    /**
-     * The type of token. Use _type to decode the data.
-     */
+    /** The type of token. Use _type to decode the data. */
     private INSTRUCTION _type;
     
-    /**
-     * List of all functions, used in toString().
-     */
+    /** List of all functions, used in toString(). */
     private static final String[] functions = { "+", "-", "*", "/", "^", "log", "neg", "conj", "sqrt", "ln", "exp", "sinh", "cosh", "tanh", "sin", "cos", "tan", "asinh", "acosh", "atanh", "asin", "acos", "atan", "inv", "mod", "arg" };
     
-    /**
-     * Constructs empty token, with data = 0 and type = EMPTY.
-     */
-    public Token() { this(new Complex(0,0), INSTRUCTION.EMPTY); }
+    /** Constructs empty token, with data = 0 and type = EMPTY. */
+    public Token() { this(new Complex(), INSTRUCTION.EMPTY); }
     
     /**
      * Construct token, composed of a data element, and a type element. Type element

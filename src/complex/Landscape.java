@@ -7,7 +7,6 @@ package complex;
 
 import complex.evaluator.Evaluator;
 
-
 /**
  * Landscape class encapsulates all members required to draw a complex landscape. This
  * includes the Evaluator class, with minimum and maximum domains.
@@ -15,19 +14,13 @@ import complex.evaluator.Evaluator;
  */
 public class Landscape 
 {
-    /**
-     * The evaluator class containing the token list and other information
-     */
+    /** The evaluator class containing the token list and other information */
     private final Evaluator _evaltor;
     
-    /**
-     * The minimum value in the domain, that is the bottom left of the landscape
-     */
+    /** The minimum value in the domain, that is the bottom left of the landscape */
     private final Complex _min;
     
-    /**
-     * The maximum value in the domain, that is the top right of the landscape
-     */
+    /** The maximum value in the domain, that is the top right of the landscape */
     private final Complex _max;
     
     /**
@@ -49,9 +42,5 @@ public class Landscape
     
     public Complex getMaxDomain() { return _max; }
     
-    @Override
-    public String toString() 
-    {
-        return "f(z) = " + _evaltor.getEquation() + "    " + _min.toString() + "    " + _max.toString() + "";
-    }
+    @Override public String toString() { return "f(z) = " + _evaltor.getEquation() + "    " + _min.toString() + "    " + _max.toString() + ""; }
 }

@@ -10,6 +10,7 @@ import widget.dialogs.HistoryDialog;
 import widget.dialogs.PropertyDialog;
 import complex.Complex;
 import java.awt.BorderLayout;
+import java.io.IOException;
 
 /**
  * Main frame showing ComplexComponent
@@ -23,11 +24,10 @@ public class MainFrame extends javax.swing.JFrame {
      */
     private final ComplexComponent _canvas;
 
-    /**
-     * Creates new MainFrame form
-     */
-    public MainFrame() 
+    /** Creates new MainFrame form */
+    public MainFrame()
     {
+        super();
         initComponents();
         
         complex.Landscape land = new complex.Landscape(new complex.evaluator.Evaluator(), new Complex(-1,-1), new Complex(1,1));
@@ -41,11 +41,12 @@ public class MainFrame extends javax.swing.JFrame {
         
         super.setDefaultCloseOperation(EXIT_ON_CLOSE);
         super.setSize(1800, 1000);
+        super.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/resources/final.ico")).getImage());
         
         lblZ.setText("");
         lblFz.setText("");
         lblPolar.setText("");
-        lblLandscape.setText(land.toString());
+        lblLandscape.setText(_canvas.getHistory().getCurrent().toString());
         
         CanvasPane.add(_canvas);
     }
@@ -54,9 +55,7 @@ public class MainFrame extends javax.swing.JFrame {
     public void paint(java.awt.Graphics g) 
     { 
         if (_canvas != null && CanvasPane != null)
-        {
             _canvas.setSize( CanvasPane.getWidth() - 20 , CanvasPane.getHeight() - 10);
-        } 
         super.paint(g); 
     }
     
@@ -77,14 +76,11 @@ public class MainFrame extends javax.swing.JFrame {
      * Function called by the ComplexComponent anytime the landscape changes 
      * @param land the new landscape
      */
-    public void landscapeChange(complex.Landscape land)
-    {
-        lblLandscape.setText(land.toString());
-    }
+    public void landscapeChange(complex.Landscape land) { lblLandscape.setText(land.toString()); }
     
     /**
      * Exposes the current evaluator in use, for use with the calculator dialog
-     * @return 
+     * @return the current evaluator
      */
     public complex.evaluator.Evaluator getCurrentEvaluator() { return _canvas.getLandscape().getEvaluator(); }
     
@@ -392,7 +388,6 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-        
         PropertyDialog d = new PropertyDialog(this, _canvas.getLandscape());
         
         if (d.getAccepted())
@@ -402,16 +397,6 @@ public class MainFrame extends javax.swing.JFrame {
     private void btnZoomOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZoomOutActionPerformed
         _canvas.centerZoom(1.0);
     }//GEN-LAST:event_btnZoomOutActionPerformed
-
-    private void tglSpeedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglSpeedActionPerformed
-     
-        _canvas.prioritiseSpeed(tglSpeed.isSelected());
-        
-        if (tglSpeed.isSelected())
-            tglSpeed.setToolTipText("Click to prioritise accuracy");
-        else
-            tglSpeed.setToolTipText("Click to prioritise speed");
-    }//GEN-LAST:event_tglSpeedActionPerformed
 
     private void btnCenterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCenterActionPerformed
         _canvas.zeroCenter();
@@ -423,6 +408,15 @@ public class MainFrame extends javax.swing.JFrame {
         if (history.getAccepted())
             _canvas.revert(history.getChosen());
     }//GEN-LAST:event_btnHistoryActionPerformed
+
+    private void tglSpeedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglSpeedActionPerformed
+        _canvas.prioritiseSpeed(tglSpeed.isSelected());
+
+        if (tglSpeed.isSelected())
+            tglSpeed.setToolTipText("Click to prioritise accuracy");
+        else
+            tglSpeed.setToolTipText("Click to prioritise speed");
+    }//GEN-LAST:event_tglSpeedActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel CanvasPane;

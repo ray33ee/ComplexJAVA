@@ -8,7 +8,7 @@ package complex.exceptions;
 import complex.Complex;
 
 /**
- *
+ * Exception thrown when the root finder fails (failure detected by NaN or infinite result)
  * @author Will
  */
 public class DivergentSeedException extends RootFinderException

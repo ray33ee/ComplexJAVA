@@ -12,8 +12,8 @@ package complex.evaluator.exceptions;
  */
 public class InvalidOperatorUseException extends EvaluatorParseException 
 {    
-    public InvalidOperatorUseException(String token) { super(token); }
+    public InvalidOperatorUseException() { super(""); }
     
     @Override
-    public String getMessage() { return "Invalid use of operator '" + super.getToken() + "' detected in formula."; }
+    public String getMessage() { return "Invalid use of operator detected in formula."; }
 }

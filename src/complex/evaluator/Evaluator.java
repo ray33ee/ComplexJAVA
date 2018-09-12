@@ -23,50 +23,31 @@ import java.util.ArrayList;
  */
 public class Evaluator {
     
-    /**
-     * Machine EPSILON value
-     */
+    /** Machine EPSILON value */
     private static final double EPSILON;
     
-    /**
-     * Square root of machine EPSILON value
-     */
+    /** Square root of machine EPSILON value */
     private static final double SQRTEPS;
     
-    /**
-     * Calculate the machine epsilon for this precision
-     */
-    static { double ep = 1; while (1.0 + 0.5*ep != 1.0) ep = 0.5 * ep; EPSILON = ep; SQRTEPS = Math.sqrt(EPSILON); }
-    
-    /**
-     * Default timeout value supplied to the newton-raphson method
-     */
+    /** Default timeout value supplied to the newton-raphson method */
     public static final int TIMEOUT = 1000;
     
-    /**
-     * List of all functions (excludes operators)
-     */
+    /** List of all functions (excludes operators) */
     private static final String[] functions = { "log", "neg", "conj", "sqrt", "ln", "exp", "sinh", "cosh", "tanh", "sin", "cos", "tan", "asinh", "acosh", "atanh", "asin", "acos", "atan", "inv", "mod", "arg" };
     
-    /**
-     * The formula represented as a list of tokens
-     */
+    /** Calculate the machine epsilon for this precision */
+    static { double ep = 1.0; while (1.0 + 0.5*ep != 1.0) ep = 0.5 * ep; EPSILON = ep; SQRTEPS = Math.sqrt(EPSILON); }
+    
+    /** The formula represented as a list of tokens */
     private Token[] _tokenlist;
     
-    /**
-     * The maximum size the stack can grow to when evaluating tokenlist
-     */
+    /** The maximum size the stack can grow to when evaluating tokenlist */
     private int _stackmax;
     
-    /**
-     * Original string representation of formula. Stored for sake of dialog box which, when created, uses
-     * this string formula in its text box.
-     */
+    /** Original string representation of formula. Stored for sake of dialog box which, when created, uses this string formula in its text box. */
     private String _equation;
     
-    /**
-     * Constructs a default instance of Evaulator, with the formula "z".
-     */
+    /** Constructs a default instance of Evaulator, with the formula "z". NOTE: Since the default argument is "z", this will not produce an error so the exception(s) are swallowed. */
     public Evaluator() {  try {setString("z");} catch (EvaluatorParseException e) {}; }
     
     /**
@@ -220,8 +201,7 @@ public class Evaluator {
     }
     
     /**
-     * Performs newton raphson on the current Evaluator equation with the seed value. 
-     * Newton raphson comes with a built in timeout feature for non-convergent cases.
+     * Performs newton raphson on the current Evaluator equation with the seed value. Newton raphson comes with a built in timeout feature for non-convergent cases.
      * @param z the seed value for newton raphson
      * @return the most accurate approximation the computer can create
      */
@@ -251,8 +231,8 @@ public class Evaluator {
         
         System.out.println("Seed(" + (next.subtract(zn)).abs() + "): " + zn.toString());
 
-	/*if ((next.subtract(zn)).abs() < EPSILON)
-		return next;*/
+	if ((next.subtract(zn)).abs() < 1E-317)
+		return next;
 
 	return nrm(next, timeout);
     }
@@ -262,7 +242,8 @@ public class Evaluator {
      * @param z the point where the computer will get the gradient
      * @return the gradient at point z
      */
-    private Complex fast_gradient(Complex z) { 
+    private Complex fast_gradient(Complex z) 
+    { 
         Complex h = z.multiply(SQRTEPS); 
         return (f(z.add(h)).subtract(f(z))).divide(h); 
     }
@@ -331,8 +312,7 @@ public class Evaluator {
     }
     
     /**
-     * Get the index of the function/operator ready to store directly in Token.data. This
-     * is represented as a number from 0 to 24.
+     * Get the index of the function/operator ready to store directly in Token.data. This is represented as a number from 0 to 24.
      * @param str string operator
      * @return the index from 0 to 24.
      */
@@ -389,8 +369,7 @@ public class Evaluator {
     }
     
     /**
-     * Takes a string token, applies shunting yard algorithm to convert 
-     * infix to RPN, then converts to Token type.
+     * Takes a string token, applies shunting yard algorithm to convert infix to RPN, then converts to Token type.
      * @param output the final output list
      * @param opStack the stack of operators
      * @param token the token to push
@@ -527,7 +506,7 @@ public class Evaluator {
         }
         
         if (!verify(output))
-            throw new InvalidOperatorUseException("FIND OFFENDING OPERATOR");
+            throw new InvalidOperatorUseException();
         
         
         ans = new Token[output.size()];
@@ -536,8 +515,7 @@ public class Evaluator {
     }
     
     /**
-     * Performs a quick run of the equation, and returns true if a single element
-     * remains on the virtual stack, else returns false
+     * Performs a quick run of the equation, and returns true if a single element remains on the virtual stack, else returns false.
      * @param output the tokenlist to test
      * @return true if the tokenlist is correct, otherwise false
      */
@@ -554,10 +532,7 @@ public class Evaluator {
         return (pretend_stack_size == 1);
     }
     
-    /**
-     * Set the _stackmax member variable by iterating through the tokenlist performing
-     * a mock run. MUST be called when _tokenlist changes.
-     */
+    /** Set the _stackmax member variable by iterating through the tokenlist performing a mock run. MUST be called when _tokenlist changes. */
     private void calculateStackmax()
     {
         _stackmax = 0;

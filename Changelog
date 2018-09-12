@@ -1,3 +1,9 @@
+Version 1.1.16
+    - CLEANUP: If an invalid path to kernel is supplied, unchecked exception is thrown.
+    - CLEANUP: Javadoc additions and minor housekeeping
+    - CLEANUP: header files no longer needed in executable directory, source is collected at compile time
+    - CLEANUP: Source is translated (via readText) at static time, and not each time the context changes
+
 Version 1.1.15
     - CLEANUP: Menu bar removed
     - FEATURE: Revert function added to ComplexComponent, history dialog implemented
@@ -5,103 +11,102 @@ Version 1.1.15
     -  DESIGN: Icon graphics touched up
     - CLEANUP: Abstract modal class created, inherited by history and property dialogs
 
-
 Version 1.1.14
     - FEATURE: Center on zero added
     - BUG FIX: Center zoom no longer adds two entries per call to history
     - FEATURE: Newton-raphson root finder and relevant exceptions added
 
 Version 1.1.13
-    - Infuriating resizing bug fixed
-    - myConvert was not displaying doubles with a small magnitude in standard form. This has been fixed
-    - Macro constants (C_ZERO, C_ONE, etc.) added to complex.h
-    - Complex infinity and NaN propagated properly
-    - Complex.toString now correctly displays +/- i.
+    - BUG FIX: Infuriating resizing bug fixed
+    - BUG FIX: myConvert was not displaying doubles with a small magnitude in standard form. This has been fixed
+    - CLEANUP: Macro constants (C_ZERO, C_ONE, etc.) added to complex.h
+    - BUG FIX: Complex infinity and NaN propagated properly
+    - BUG FIX: Complex.toString now correctly displays +/- i.
 
 Version 1.1.12
-    - Trig and inverse trig functions implemented in C kernel and java Evaluator
-    - prioritiseSpeed function added to ComplexComponent to facilitate selection between speed and accuracy
-    - Kernel is now passed double/floating values depending on support
+    - FEATURE: Trig and inverse trig functions implemented in C kernel and java Evaluator
+    - FEATURE: prioritiseSpeed function added to ComplexComponent to facilitate selection between speed and accuracy
+    - FEATURE: Kernel is now passed double/floating values depending on support
 
 Version 1.1.11
-    - Fixed bug where complex values with magnitude around 1e153 were overflowing
-    - Javadoc updated
-    - PI related constants use built in OpenCL constants (see real.h)
+    - BUG FIX: Fixed bug where complex values with magnitude around 1e153 were overflowing
+    - CLEANUP: Javadoc updated
+    - CLEANUP: PI related constants use built in OpenCL constants (see real.h)
 
 Version 1.1.10
-    - Right associativity bug fixed
-    - Ownership of _history transfered from MainFrame to ComplexComponent
-    - Custom double to string converted added to Complex class
-    - Calculator dialog added
+    - BUG FIX: Right associativity bug fixed
+    - CLEANUP: Ownership of _history transfered from MainFrame to ComplexComponent
+    - FEATURE: Custom double to string converted added to Complex class
+    - FEATURE: Calculator dialog added
 
 Version 1.1.9
-    - History class complete, uses generics instead of object
-    - _landscape variable in MainFrame replaced with _history.getCurrent()
-    - Updated Javadoc
+    - CLEANUP: History class complete, uses generics instead of object
+    - CLEANUP: _landscape variable in MainFrame replaced with _history.getCurrent()
+    - CLEANUP: Updated Javadoc
 
 Version 1.1.8
-    - Whitespace is ignored
-    - Leading '-' issue resolved
-    - Add mouse listener events to ComplexComponent class
-    - Evaluator parser exceptions implemented, said exceptions caught in dialog
+    - BUG FIX: Whitespace is ignored
+    - BUG FIX: Leading '-' issue resolved
+    - FEATURE: Add mouse listener events to ComplexComponent class
+    - FEATURE: Evaluator parser exceptions implemented, said exceptions caught in dialog
 
 Version 1.1.7
-    - ComplexColor renamed to Complex lib with toString function added
-    - Landscape class (encapsulating min, max and evaltor fields) created
-    - Landscape class used in ComplexComponent, MainFrame and PropertyDialog.
+    - CLEANUP: ComplexColor renamed to Complex lib with toString function added
+    - CLEANUP: Landscape class (encapsulating min, max and evaltor fields) created
+    - CLEANUP: Landscape class used in ComplexComponent, MainFrame and PropertyDialog.
 
 Version 1.1.6
-    - Main JFrame now implemented via MainFrame class.
-    - Various warnings and issues fixed
+    - CLEANUP: Main JFrame now implemented via MainFrame class.
+    - CLEANUP: Various warnings and issues fixed
 
 Version 1.1.5
-    - Evaluator setString now complete, converts string formula into tokenlist
-    - Javadoc updated on all classes (Javadocs now supplied for member variables)
+    - FEATURE: Evaluator setString now complete, converts string formula into tokenlist
+    - CLEANUP: Javadoc updated on all classes (Javadocs now supplied for member variables)
 
 Version 1.1.4
-    - Fixed crashing GPU bug
-    - Host code now creates float or double buffer depending on double precision support
+    - BUG FIX: Fixed crashing GPU bug
+    - BUG FIX: Host code now creates float or double buffer depending on double precision support
 
 Version 1.1.3
-    - Global stack implemented
-    - Function evaluator code in kernel complete
+    - FEATURE: Global stack implemented
+    - FEATURE: Function evaluator code in kernel complete
 
 Version 1.1.2
-    - Move project cleaning
-    - Added Evaulator and Token classes back (for trace and newton raphson
-    - Local memory implemented for stack, calculations moved from kernel to evaulator function
+    - CLEANUP: Move project cleaning
+    - FEATURE: Added Evaulator and Token classes back (for trace and newton raphson
+    - CLEANUP: Local memory implemented for stack, calculations moved from kernel to evaulator function
 
 Version 1.1.1
     - Clean project folder
     - Kernel moved to folder, C include files created and placed in /include/
 
 Version 1.1.0
-    - OpenCL implementation
-    - Support for double or single precision
+    - FEATURE: OpenCL implementation
+    - FEATURE: Support for double or single precision
 
 Version 1.0.6
-    - Multithreading implemented, broken image bug fixed
+    - FEATURE: Multithreading implemented, broken image bug fixed
 
 Version 1.0.5
-    - Renamed 'classes' folder to 'complex'
-    - Renamed 'Complex2' to 'ComplexColor'
-    - Basic concurrency implemented
+    - CLEANUP: Renamed 'classes' folder to 'complex'
+    - CLEANUP: Renamed 'Complex2' to 'ComplexColor'
+    - FEATURE: Basic concurrency implemented
 
 Version 1.0.4
-    - Evaluator object implemented (without string conversion)
+    - FEATURE: Evaluator object implemented (without string conversion)
 
 Version 1.0.3
-    - Complex2 doesn't inherit Complex, instead just implements static color function. 
+    - FEATURE: Complex2 doesn't inherit Complex, instead just implements static color function. 
       (this avoids the issue of converting from Complex to Complex2.
-    - Evaluator and Token class added
+    - FEATURE: Evaluator and Token class added
 
 Version 1.0.2
-    - Successfully created basic landscape - yay!
+    - FEATURE: Successfully created basic landscape - yay!
 
 Version 1.0.1
-    - ComplexPanel added (which inherits JPanel) this class will be responsible for drawing.
-    - ComplexPanel not inherited into main class, but instantiated in main instead
-    - Doc comments added to Complex2 and ComplexComponent.
+    - FEATURE: ComplexPanel added (which inherits JPanel) this class will be responsible for drawing.
+    - FEATURE: ComplexPanel not inherited into main class, but instantiated in main instead
+    - FEATURE: Doc comments added to Complex2 and ComplexComponent.
 
 Version 1.0.0
     - First Commit
