@@ -350,6 +350,8 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(StatusPane, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
+        getAccessibleContext().setAccessibleName("Complex Grpaher - Version 1.1.17");
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 

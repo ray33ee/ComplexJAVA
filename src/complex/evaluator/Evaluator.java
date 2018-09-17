@@ -6,13 +6,14 @@
 package complex.evaluator;
 
 import complex.Complex;
-import complex.Token;
 import java.util.Stack;
 //import org.apache.commons.math3.complex.Complex;
 
 import complex.evaluator.exceptions.*;
 import complex.exceptions.*;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *  This Evaluator class acts as a functor for calculating f(z), f'(z) and the value of z such that f(z)=0.
@@ -23,6 +24,105 @@ import java.util.ArrayList;
  */
 public class Evaluator {
     
+    /**
+    *  Token class, represents an individual token. This token can either be the independent variable, a constant or a function/operator. 
+    *  It contains _data and _type, which explains how _data should be treated.
+    * @author Will
+    */
+    private static class Token extends Object {
+
+        /**
+        * An enum containing the 'type' of data in the token. EMPTY is the value 
+        * assigned with an empty constructor. VARIABLE tells the evaluator to 
+        * use the independent variable (_data will be 0). OPERATOR tells the 
+        * evaluator that the data is an operator, (_data will be Complex(n, 0) where
+        * n is the index of the operator. And CONSTANT tells the evaluator that the 
+        * _data is a constant (_data is the constant.)
+        */
+        public enum INSTRUCTION { EMPTY, VARIABLE, OPERATOR, CONSTANT }
+
+        /** Data in the token. This could be a constant or an index to a function */
+        private Complex     _data;
+
+        /** The type of token. Use _type to decode the data. */
+        private INSTRUCTION _type;
+
+        /** List of all functions, used in toString(). */
+        public static final String[] functions = { "+", "-", "*", "/", "^", "log", "neg", "conj", "sqrt", "ln", "exp", "sinh", "cosh", "tanh", "sin", "cos", "tan", "asinh", "acosh", "atanh", "asin", "acos", "atan", "inv", "mod", "arg" };
+
+        /** Constructs empty token, with data = 0 and type = EMPTY. */
+        public Token() { this(new Complex(), INSTRUCTION.EMPTY); }
+
+        /**
+         * Construct token, composed of a data element, and a type element. Type element
+         * tells the evaluator to treat the data as a variable, operator or a constant.
+         * @param data  
+         * @param type 
+         */
+        public Token(Complex data, INSTRUCTION type) { _data = data; _type = type; }
+
+        /**
+         * Get the _data element. 
+         * @return the _data element
+         */
+        public Complex getData() { return _data; }
+
+        /**
+         * Get the _type element
+         * @return the _type element
+         */ 
+        public INSTRUCTION getType() { return _type; } 
+
+        /**
+         * Get the _type as an integer 
+         * @return the _type converted to int
+         */
+        public int getInt()
+        {
+            switch (_type)
+            {
+                case VARIABLE:
+                    return 1;
+                case OPERATOR:
+                    return 2;
+                case CONSTANT:
+                    return 3;
+            }
+            return 0;
+        }
+
+        /**
+         * Set the data in the token
+         * @param data the data to set
+         */
+        public void setData(Complex data) { _data = data; }
+
+        /**
+         * Set the type in the token
+         * @param type the type to set
+         */
+        public void setInstruction(INSTRUCTION type) { _type = type; }
+
+        /**
+         * Convert token to string format
+         * @return token as a string
+         */
+        @Override
+        public String toString()
+        {
+            switch (_type) {
+                case VARIABLE:
+                    return "z";
+                case CONSTANT:
+                    return _data.toString();
+                case OPERATOR:
+                    return functions[(int)_data.getReal()];
+                default:
+                    return "NULL";
+            }
+        }
+    }
+    
     /** Machine EPSILON value */
     private static final double EPSILON;
     
@@ -30,13 +130,37 @@ public class Evaluator {
     private static final double SQRTEPS;
     
     /** Default timeout value supplied to the newton-raphson method */
-    public static final int TIMEOUT = 1000;
+    public static final int TIMEOUT = 1000;    
     
-    /** List of all functions (excludes operators) */
-    private static final String[] functions = { "log", "neg", "conj", "sqrt", "ln", "exp", "sinh", "cosh", "tanh", "sin", "cos", "tan", "asinh", "acosh", "atanh", "asin", "acos", "atan", "inv", "mod", "arg" };
+    /** Pattern to match floating point numbers. Distinguishing unary and binary +- operators */
+    private static final String floatingRegex = "(((?<=[(*/^])|^)[+-]*)?(\\b[0-9]+(\\.[0-9]*)?|\\.[0-9]+\\b)(e[-+]*?[0-9]+\\b)?";
+
+    /** Pattern to match supported functions */
+    private static final String functionsRegex;
+
+    /** Pattern to match supported constants */
+    private static final String constantsRegex = "e|pi|i";
+
+    /** Pattern to match supported operators */
+    private static final String operatorsRegex = "[*/^]|[+-]+";
+
+    /** Pattern to tokenise equations */
+    private static final Pattern equationPattern;
     
-    /** Calculate the machine epsilon for this precision */
-    static { double ep = 1.0; while (1.0 + 0.5*ep != 1.0) ep = 0.5 * ep; EPSILON = ep; SQRTEPS = Math.sqrt(EPSILON); }
+    /** Calculate the machine epsilon for this precision and build the pattern that will tokenise equations*/
+    static 
+    { 
+        double ep = 1.0; while (1.0 + 0.5*ep != 1.0) ep = 0.5 * ep; EPSILON = ep; SQRTEPS = Math.sqrt(EPSILON); 
+        
+        //Build the functionRegex from the list of functions in Token class
+        String functions = new String();
+        for (int i = 5; i < Token.functions.length-1; ++i)
+            functions += Token.functions[i] + "|";
+        functions += Token.functions[Token.functions.length-1];
+        functionsRegex = functions;
+        
+        equationPattern = Pattern.compile(floatingRegex + "|" + functionsRegex + "|" + constantsRegex + "|z|" + operatorsRegex + "|[()\\[\\]{},]");
+    }
     
     /** The formula represented as a list of tokens */
     private Token[] _tokenlist;
@@ -54,13 +178,37 @@ public class Evaluator {
      * Constructs an instance of Evaulator with a specific formula
      * @param formula the equation to convert
      */
-    public Evaluator(String formula) throws InvalidTokenException, MissingLeftBracketException, MissingRightBracketException, InvalidOperatorUseException { setString(formula); }
+    public Evaluator(String formula) throws InvalidTokenException, MissingLeftBracketException, MissingRightBracketException, InvalidOperatorUseException, FloatingFormatException, FloatingOverflowException { setString(formula); }
     
-    /**
-     * Obtains a copy (via clone) of the list of tokens
-     * @return a copy of the array of tokens stored
-     */
-    public Token[] getTokens() { return _tokenlist.clone(); }
+    public <T extends Number> Object[] getTokensDouble() 
+    {
+        Number[] lst = new Number[_tokenlist.length*3];
+        
+        for (int i = 0; i < _tokenlist.length; ++i)
+        {
+            lst[3*i] =  (double)_tokenlist[i].getData().getReal();
+            lst[3*i+1] = (double)_tokenlist[i].getData().getImaginary();
+            lst[3*i+2] = (double)_tokenlist[i].getInt();
+        }
+        
+        return lst;
+    }
+    
+    public <T extends Number> Object[] getTokensFloat() 
+    {
+        Number[] lst = new Number[_tokenlist.length*3];
+        
+        for (int i = 0; i < _tokenlist.length; ++i)
+        {
+            lst[3*i] =  (float)_tokenlist[i].getData().getReal();
+            lst[3*i+1] = (float)_tokenlist[i].getData().getImaginary();
+            lst[3*i+2] = (float)_tokenlist[i].getInt();
+        }
+        
+        return lst;
+    }
+    
+    public int getTokenLength() { return _tokenlist.length; }
     
     /**
      * Get the maximum size of the stack required for a single evaluation of the formula.
@@ -79,7 +227,44 @@ public class Evaluator {
      * max stack size. 
      * @param formula the formula to convert
      */
-    public void setString(String formula) throws InvalidTokenException, MissingLeftBracketException, MissingRightBracketException, InvalidOperatorUseException { _tokenlist = processString(formula); calculateStackmax(); _equation = formula; }
+    public void setString(String formula) throws InvalidTokenException, MissingLeftBracketException, MissingRightBracketException, InvalidOperatorUseException, FloatingFormatException, FloatingOverflowException
+    { 
+        ArrayList<Token> output = new ArrayList<>();
+        Stack<String> opStack = new Stack<>();
+        
+        String prev = "";
+        
+        formula = formula.toLowerCase();
+        
+        formula = removeWhitespace(formula);
+        
+        Matcher match = equationPattern.matcher(formula);
+        
+        while (match.find())
+        {
+            String val = match.group();
+            sendToken(output, opStack, val, prev);
+            prev = val;
+        }
+
+        while (!opStack.isEmpty())
+        {
+            String item = opStack.pop();
+            if (!item.equals("("))
+                    output.add(new Token(new Complex(getIndex(item)), Token.INSTRUCTION.OPERATOR));
+            else 
+                throw new MissingRightBracketException();
+        }
+        
+        if (!verify(output))
+            throw new InvalidOperatorUseException();
+        
+        _tokenlist = new Token[output.size()];
+        _tokenlist = (Token[])output.toArray(_tokenlist);
+        
+        calculateStackmax(); 
+        _equation = formula; 
+    }
     
     /**
      * Use the formula from the token list to calculate the expression f(z)
@@ -248,26 +433,34 @@ public class Evaluator {
         return (f(z.add(h)).subtract(f(z))).divide(h); 
     }
     
-    private static boolean isNum(char ch) { return ch >= '0' && ch <= '9'; }
-    
-    private static boolean isLetter(char ch) { return ch >= 'a' && ch <= 'z'; }
-    
     /**
      * Determines whether the string can be converted to a valid number
      * @param str the string to test
      * @return true if str can be written as a number, false otherwise
      */
-    private static boolean isNum(String str)
+    private static boolean isNum(String str) throws FloatingFormatException, FloatingOverflowException
     {
-        try 
+        if (str.matches(floatingRegex)) //Valid real number
         {
-            Double.parseDouble(str);
+            Double res;
+            try
+            {
+                res = Double.parseDouble(str);
+            }
+            catch (NumberFormatException e)
+            {
+                throw new FloatingFormatException(str);
+            }
+            
+            if (res.isInfinite())
+                throw new FloatingOverflowException(str);
+                    
+            return true;
         }
-        catch (NumberFormatException e)
+        else
         {
             return false;
         }
-        return true;
     }
     
     /**
@@ -275,20 +468,14 @@ public class Evaluator {
      * @param str the string to test
      * @return true if str is one of the following - +, -, *, /, ^ or neg (unary negate)
      */
-    private static boolean isOp(String str) { return str.equals("+") || str.equals("-") || str.equals("*") || str.equals("/") || str.equals("^") || str.equals("neg" ); }
+    private static boolean isOp(String str) { return str.matches(operatorsRegex); } //return str.equals("+") || str.equals("-") || str.equals("*") || str.equals("/") || str.equals("^") || str.equals("neg" ); }
     
     /**
      * Determines whether the string is a function
      * @param str the string to test
      * @return true if the str is in the 'functions' list
      */
-    private static boolean isFunction(String str)
-    {
-        for (int i = 0; i < functions.length; ++i)
-            if (str.equals(functions[i]))
-                return true;
-        return false;
-    }
+    private static boolean isFunction(String str) { return str.matches(functionsRegex); }
     
     /**
      * Get the precedence of the operator, from 1 to 3.
@@ -318,29 +505,9 @@ public class Evaluator {
      */
     private static int getIndex(String str)
     {
-        if (isOp(str) && !str.equals("neg"))
-        {
-            switch (str) {
-                case "+":
-                    return 0;
-                case "-":
-                    return 1;
-                case "*":
-                    return 2;
-                case "/":
-                    return 3;
-                case "^":
-                    return 4;
-                default:
-                    break;
-            }
-        }
-        else
-        {
-            for (int i = 0; i < functions.length; ++i)
-                if (str.equals(functions[i]))
-                    return i + 5;
-        }
+        for (int i = 0; i < Token.functions.length; ++i)
+            if (str.equals(Token.functions[i]))
+                return i;
         return -1;
     }
     
@@ -351,22 +518,13 @@ public class Evaluator {
      * @param token
      * @return true if the token is a unary negative
      */
-    private static boolean isUnaryNegative(ArrayList<Token> output, Stack<String> opStack, String prevToken) { return (output.isEmpty() && opStack.isEmpty()) || prevToken.equals("(") || prevToken.equals("neg") || isOp(prevToken); }
+    private static boolean isUnaryNegative(ArrayList<Token> output, Stack<String> opStack, String prevToken) { return (output.isEmpty() && opStack.isEmpty()) || prevToken.equals("(") || prevToken.equals("neg") || isOp(prevToken);  }
     
     /**
      * Removes all whitespace from the string
      * @param str string to remove
      */
-    private static String removeWhitespace(String str)
-    {
-        String ans = "";
-        
-        for (int i = 0; i < str.length(); ++i)
-            if (str.charAt(i) != ' ' && str.charAt(i) != '\n' && str.charAt(i) != '\t')
-                ans += str.charAt(i);
-        
-        return ans;
-    }
+    private static String removeWhitespace(String str) { return Pattern.compile("\\s").matcher(str).replaceAll(""); }
     
     /**
      * Takes a string token, applies shunting yard algorithm to convert infix to RPN, then converts to Token type.
@@ -374,7 +532,7 @@ public class Evaluator {
      * @param opStack the stack of operators
      * @param token the token to push
      */
-    private static void sendToken(ArrayList<Token> output, Stack<String> opStack, String token, String prev) throws InvalidTokenException, MissingLeftBracketException
+    private static void sendToken(ArrayList<Token> output, Stack<String> opStack, String token, String prev) throws InvalidTokenException, MissingLeftBracketException, FloatingFormatException, FloatingOverflowException
     {
         if (!token.isEmpty())
         {
@@ -388,17 +546,6 @@ public class Evaluator {
                 output.add(new Token(new Complex(Math.PI), Token.INSTRUCTION.CONSTANT));
             else if (token.equals("e"))
                 output.add(new Token(new Complex(Math.E), Token.INSTRUCTION.CONSTANT));
-            else if (isFunction(token))
-                opStack.push(token);
-            else if (token.equals(","))
-            {
-                while (opStack.size() > 0)
-                {
-                    if (opStack.peek().equals("("))
-                        break;
-                    output.add(new Token(new Complex(getIndex(token)), Token.INSTRUCTION.OPERATOR));
-                }
-            }
             else if (isOp(token))
             {
                 if (token.equals("-") && isUnaryNegative(output, opStack, prev))
@@ -415,6 +562,18 @@ public class Evaluator {
                     opStack.add(token);
                 }
             }
+            else if (isFunction(token))
+                opStack.push(token);
+            else if (token.equals(","))
+            {
+                while (opStack.size() > 0)
+                {
+                    if (opStack.peek().equals("("))
+                        break;
+                    output.add(new Token(new Complex(getIndex(token)), Token.INSTRUCTION.OPERATOR));
+                }
+            }
+            
             else if (token.equals("(") || token.equals("{") || token.equals("[")) //Left bracket
             {
                 opStack.add("(");
@@ -442,76 +601,6 @@ public class Evaluator {
             else
                 throw new InvalidTokenException(token); //System.err.println("UNRECOSNISED TOKEN: '" + token + "'");
         }
-    }
-    
-    /**
-     * Converts a string to a list of tokens. Takes a string, separates each token and processes them individually. 
-     * @param str the string to process
-     * @return the formula as a token list
-     */
-    private static Token[] processString(String str) throws InvalidTokenException, MissingLeftBracketException, MissingRightBracketException, InvalidOperatorUseException
-    {
-        ArrayList<Token> output = new ArrayList<>();
-        Stack<String> opStack = new Stack<>();
-        Token[] ans;
-        
-        String buff = "";
-        String prev = "";
-        
-        str = str.toLowerCase();
-        
-        str = removeWhitespace(str);
-        
-        for (int i = 0; i < str.length(); ++i)
-        {
-            char ch = str.charAt(i);
-            
-            if (i == 0)
-            {
-                if (ch == '-' || ch == '(')
-                    sendToken(output, opStack, new String(new char[] {ch} ), prev);
-                else
-                    buff += ch;
-                
-                continue;
-            }
-            
-            if (isLetter(ch) || 
-                    isNum(ch) || 
-                    ch == '.' || 
-                    (ch == 'e' && isNum(str.charAt(i-1))) || 
-                    (ch == '+' || ch == '-') && str.charAt(i-1) == 'e')
-            {
-                buff += ch;
-            }
-            else
-            {
-                sendToken(output, opStack, buff, prev);
-                if (!buff.isEmpty())
-                    prev = buff;
-                sendToken(output, opStack, new String(new char[] {ch} ), prev);
-                prev = new String(new char[] {ch} );
-                buff = "";
-            }
-        }
-        sendToken(output, opStack, buff, prev);
-
-        while (!opStack.isEmpty())
-        {
-            String item = opStack.pop();
-            if (!item.equals("("))
-                    output.add(new Token(new Complex(getIndex(item)), Token.INSTRUCTION.OPERATOR));
-            else 
-                throw new MissingRightBracketException();
-        }
-        
-        if (!verify(output))
-            throw new InvalidOperatorUseException();
-        
-        
-        ans = new Token[output.size()];
-        ans = (Token[])output.toArray(ans);
-        return ans;
     }
     
     /**
@@ -565,3 +654,4 @@ public class Evaluator {
     }
     
 }
+

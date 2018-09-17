@@ -1,4 +1,7 @@
 - Find offending operator when throwing InvalidOperatorUseException exception
 - Thoroughly test all functions by sampling random values, checking colouring, and testing at and beyond double precision limits
-- Test and prevent input values in mindomain and maxdomain within dialog box for overflow (+/- infinity) and NaN
+- Test and prevent input values in mindomain and maxdomain within dialog box for NaN
 - If values overflow in calculator, inform user value is too large to store (arbitrary precision maybe?)
+- Add real and imag functions 
+- Throw FloatingOverflowException depending on precision type (single or double)
+- Use regex '[+-]{2,}' to detect compounded unary negative/positive, and then compress into either single '-' or no character.

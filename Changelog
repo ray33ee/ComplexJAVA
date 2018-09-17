@@ -1,3 +1,11 @@
+Version 1.1.17
+    - CLEANUP: Token class now implemented as a privated nested class of Evaluator. 
+    - CLEANUP: Setarray is now used to copy token list
+    - CLEANUP: Static function processString removed from evaulator, code placed in member method setString
+    - CLEANUP: Equation string is now tokenised via dynamically (i.e. at runtime) built regex.
+    - CLEANUP: removewhitespace, isop, isnum and other functions implemented via regex
+    - BUG FIX: Badly formatted and overflowing numbers now throw exceptions
+
 Version 1.1.16
     - CLEANUP: If an invalid path to kernel is supplied, unchecked exception is thrown.
     - CLEANUP: Javadoc additions and minor housekeeping

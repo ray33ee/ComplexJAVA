@@ -20,10 +20,7 @@ import org.bridj.Pointer;
 import static org.bridj.Pointer.*;
 import java.io.IOException;
 
-import complex.Token;
 import complex.Landscape;
-import complex.evaluator.Evaluator;
-import complex.exceptions.DivergentSeedException;
 import complex.exceptions.RootFinderException;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -68,20 +65,20 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     {
         try
         {
-            java.net.URL complexaddr = ComplexComponent.class.getResource("/inc/real.h");
-            java.net.URL realaddr = ComplexComponent.class.getResource("/inc/complex.h");
-            java.net.URL addr = ComplexComponent.class.getResource("/kernel/kernel.cl");
+            java.net.URL complexpath = ComplexComponent.class.getResource("/inc/real.h");
+            java.net.URL realpath = ComplexComponent.class.getResource("/inc/complex.h");
+            java.net.URL kernelpath = ComplexComponent.class.getResource("/kernel/kernel.cl");
             
-            if (addr == null || realaddr == null || complexaddr == null)
+            if (kernelpath == null || realpath == null || complexpath == null)
                 throw new Error("Exception at widget.ComplexComponent.prioritiseSpeed(), error \"" + new NullPointerException().toString() + "\". Could not find resource.");
             
-            ComplexSource = IOUtils.readText(complexaddr);
-            RealSource = IOUtils.readText(realaddr);
-            KernelSource = IOUtils.readText(addr);
+            ComplexSource = IOUtils.readText(complexpath);
+            RealSource = IOUtils.readText(realpath);
+            KernelSource = IOUtils.readText(kernelpath);
         }
         catch (IOException e)
         {
-            throw new Error("IOException at widget.ComplexComponent.prioritiseSpeed(), error \"" + e.toString() + "\". Problem with accessing 'kernel.cl'.");
+            throw new Error("IOException at widget.ComplexComponent.prioritiseSpeed(), error \"" + e.toString() + "\". Problem with accessing kernel source code.");
         }
     }
     
@@ -93,6 +90,9 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     public ComplexComponent(Landscape first, MainFrame parent)
     {
         super();
+        
+       /*if (!JavaCL.OpenCLProbeLibrary.hasOpenCL1_0())
+            throw new Error("No OpenCL");*/
         
         _history = new History();
         
@@ -307,22 +307,11 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         BufferedImage bufferedImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         int[] imagePixelData = ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
         
-        //Get a copy of the token list
-        Token[] list = _history.getCurrent().getEvaluator().getTokens();
-        
         CLBuffer tokenBuff;
         if (_context.isDoubleSupported()) //_context.isDoubleSupported()
         {
             //Token list is implemented as a list of floats. Each group of three floats represents real, imaginary and type of a token
-            Pointer<Double> tokenPtr = allocateDoubles(list.length * 3); //.order(_context.getByteOrder());
-
-            //Copy tokens
-            for (int i = 0; i < list.length; ++i)
-            {
-                tokenPtr.set(3*i, list[i].getData().getReal());
-                tokenPtr.set(3*i+1, list[i].getData().getImaginary());
-                tokenPtr.set(3*i+2, (double)list[i].getInt());
-            }
+            Pointer<Double> tokenPtr = allocateDoubles(_history.getCurrent().getEvaluator().getTokenLength() * 3).setArray(_history.getCurrent().getEvaluator().getTokensDouble());
 
             //Create input buffer for token list
             tokenBuff = _context.createDoubleBuffer(CLMem.Usage.Input, tokenPtr);
@@ -330,15 +319,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         else
         {
             //Token list is implemented as a list of floats. Each group of three floats represents real, imaginary and type of a token
-            Pointer<Float> tokenPtr = allocateFloats(list.length * 3); //.order(_context.getByteOrder());
-
-            //Copy tokens
-            for (int i = 0; i < list.length; ++i)
-            {
-                tokenPtr.set(3*i, (float)list[i].getData().getReal());
-                tokenPtr.set(3*i+1, (float)list[i].getData().getImaginary());
-                tokenPtr.set(3*i+2, (float)list[i].getInt());
-            }
+            Pointer<Float> tokenPtr = allocateFloats(_history.getCurrent().getEvaluator().getTokenLength() * 3).setArray(_history.getCurrent().getEvaluator().getTokensFloat()); //.order(_context.getByteOrder());
 
             //Create input buffer for token list
             tokenBuff = _context.createFloatBuffer(CLMem.Usage.Input, tokenPtr);
@@ -358,7 +339,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         {
             _kernel.setArgs(
                 tokenBuff, stackbuff,
-                list.length,
+                _history.getCurrent().getEvaluator().getTokenLength(),
                 _history.getCurrent().getMinDomain().getReal(), 
                 _history.getCurrent().getMaxDomain().getImaginary(), 
                 (_history.getCurrent().getMaxDomain().getReal() - _history.getCurrent().getMinDomain().getReal()), 
@@ -369,7 +350,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         {
             _kernel.setArgs(
                 tokenBuff, stackbuff,
-                list.length,
+                _history.getCurrent().getEvaluator().getTokenLength(),
                 (float)_history.getCurrent().getMinDomain().getReal(), 
                 (float)_history.getCurrent().getMaxDomain().getImaginary(), 
                 (float)(_history.getCurrent().getMaxDomain().getReal() - _history.getCurrent().getMinDomain().getReal()), 
