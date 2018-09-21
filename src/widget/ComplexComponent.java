@@ -55,11 +55,11 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     /** Stores reference to parent object */
     private final MainFrame _parent;
     
-    private static final String RealSource;
+    private static final String realSource;
     
-    private static final String ComplexSource;
+    private static final String complexSource;
     
-    private static final String KernelSource;
+    private static final String kernelSource;
     
     static
     {
@@ -70,15 +70,15 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
             java.net.URL kernelpath = ComplexComponent.class.getResource("/kernel/kernel.cl");
             
             if (kernelpath == null || realpath == null || complexpath == null)
-                throw new Error("Exception at widget.ComplexComponent.prioritiseSpeed(), error \"" + new NullPointerException().toString() + "\". Could not find resource.");
+                throw new RuntimeException("Exception at widget.ComplexComponent.prioritiseSpeed(), error \"" + new NullPointerException().toString() + "\". Could not find resource.");
             
-            ComplexSource = IOUtils.readText(complexpath);
-            RealSource = IOUtils.readText(realpath);
-            KernelSource = IOUtils.readText(kernelpath);
+            complexSource = IOUtils.readText(complexpath);
+            realSource = IOUtils.readText(realpath);
+            kernelSource = IOUtils.readText(kernelpath);
         }
         catch (IOException e)
         {
-            throw new Error("IOException at widget.ComplexComponent.prioritiseSpeed(), error \"" + e.toString() + "\". Problem with accessing kernel source code.");
+            throw new RuntimeException("IOException at widget.ComplexComponent.prioritiseSpeed(), error \"" + e.toString() + "\". Problem with accessing kernel source code.");
         }
     }
     
@@ -156,7 +156,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         
         _queue = _context.createDefaultQueue();
         
-        CLProgram program = _context.createProgram(ComplexSource, RealSource, KernelSource);
+        CLProgram program = _context.createProgram(complexSource, realSource, kernelSource);
         
         _kernel = program.createKernel("get_landscape");
         

@@ -24,11 +24,13 @@ import java.util.regex.Pattern;
  */
 public class Evaluator {
     
+    
     /**
     *  Token class, represents an individual token. This token can either be the independent variable, a constant or a function/operator. 
     *  It contains _data and _type, which explains how _data should be treated.
     * @author Will
     */
+    // <editor-fold defaultstate="collapsed" desc="Token Class"> 
     private static class Token extends Object {
 
         /**
@@ -133,7 +135,7 @@ public class Evaluator {
     public static final int TIMEOUT = 1000;    
     
     /** Pattern to match floating point numbers. Distinguishing unary and binary +- operators */
-    private static final String floatingRegex = "(((?<=[(*/^])|^)[+-]*)?(\\b[0-9]+(\\.[0-9]*)?|\\.[0-9]+\\b)(e[-+]*?[0-9]+\\b)?";
+    private static final String floatingRegex = "(?:(?:(?<=[(*/^])|^)[+-]*)?(?:\\b[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+\\b)(?:e[-+]*?[0-9]+\\b)?";
 
     /** Pattern to match supported functions */
     private static final String functionsRegex;
@@ -172,7 +174,7 @@ public class Evaluator {
     private String _equation;
     
     /** Constructs a default instance of Evaulator, with the formula "z". NOTE: Since the default argument is "z", this will not produce an error so the exception(s) are swallowed. */
-    public Evaluator() {  try {setString("z");} catch (EvaluatorParseException e) {}; }
+    public Evaluator() {  try {setString("z");} catch (EvaluatorParseException e) { throw new RuntimeException("Call to setString in default constructor of Evaluator has failed - " + e.getMessage()); } }
     
     /**
      * Constructs an instance of Evaulator with a specific formula
@@ -391,6 +393,23 @@ public class Evaluator {
      * @return the most accurate approximation the computer can create
      */
     public Complex newton_raphson(Complex z) throws DivergentSeedException, TimeoutException { return nrm(z, TIMEOUT); }
+    
+    @Override
+    public String toString()
+    {
+        String ans = "Evaluator(" + _equation + ") = { ";
+        
+        if (_tokenlist.length == 0)
+            return ans + " }";
+        
+        for (int i = 0; i < _tokenlist.length-1; ++i)
+            ans += _tokenlist[i].toString() + ", ";
+        
+        ans += _tokenlist[_tokenlist.length-1].toString() + " }";
+        
+        return ans;
+    }
+    
     
     /**
      * Recursive newton raphson function
@@ -636,22 +655,5 @@ public class Evaluator {
         }
         
     }
-    
-    @Override
-    public String toString()
-    {
-        String ans = "Evaluator(" + _equation + ") = { ";
-        
-        if (_tokenlist.length == 0)
-            return ans + " }";
-        
-        for (int i = 0; i < _tokenlist.length-1; ++i)
-            ans += _tokenlist[i].toString() + ", ";
-        
-        ans += _tokenlist[_tokenlist.length-1].toString() + " }";
-        
-        return ans;
-    }
-    
 }
 

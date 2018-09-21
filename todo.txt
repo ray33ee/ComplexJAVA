@@ -3,5 +3,10 @@
 - Test and prevent input values in mindomain and maxdomain within dialog box for NaN
 - If values overflow in calculator, inform user value is too large to store (arbitrary precision maybe?)
 - Add real and imag functions 
-- Throw FloatingOverflowException depending on precision type (single or double)
+- Throw FloatingOverflowException depending on precision type (single or double) (i.e. the number 1e300 will not throw an error for double, but will for float)
 - Use regex '[+-]{2,}' to detect compounded unary negative/positive, and then compress into either single '-' or no character.
+- Change type in token from int to enum
+- Modify shunting yard algorithm to allow operations on constants (such as sin(pi)) to be resolved during setString. Also extend this for chained multiply and add.
+- Complete save image feature
+- Print time taken to create and display image in System.out.println
+- Throw NonExpressionException if independent variable 'z' appears i min or max domain inputs in property dialog

@@ -1,3 +1,7 @@
+Version 1.1.18
+    - CLEANUP: First draft of specification complete.
+    - CLEANIP: Documentation created.
+
 Version 1.1.17
     - CLEANUP: Token class now implemented as a privated nested class of Evaluator. 
     - CLEANUP: Setarray is now used to copy token list
