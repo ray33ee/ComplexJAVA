@@ -15,5 +15,5 @@ public class DivergentSeedException extends RootFinderException
 {
     public DivergentSeedException(Complex val, int iteration) { super(val, iteration); }
     
-    @Override public String getMessage() { return "Root-finding failed. Iteration " + super.getIteration() + " has the value " + super.getValue().toString() + ". Most likely cause is divergent function or bad seed."; }
+    @Override public String getMessage() { return "Root-finding failed. Iteration " + super.getIteration() + " has the value " + super.getValue() + ". Most likely cause is divergent function or bad seed."; }
 }

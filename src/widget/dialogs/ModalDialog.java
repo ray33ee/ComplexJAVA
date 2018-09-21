@@ -25,6 +25,7 @@ public abstract class ModalDialog extends javax.swing.JDialog
         super(parent, title, true);
         _accepted = false;
         
+        super.setResizable(false);
         super.setLocation(parent.getX() + parent.getWidth() / 2 - super.getWidth() / 2, parent.getY() + parent.getHeight()/ 2 - super.getHeight()/ 2);
     }
     

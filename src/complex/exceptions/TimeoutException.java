@@ -15,5 +15,5 @@ public class TimeoutException extends RootFinderException
 {
     public TimeoutException(Complex val, int iteration) { super(val, iteration); }
     
-    @Override public String getMessage() { return "Root finder has timed out at " + getIteration() + ", with value " + getValue().toString() + ". Most likely cause is divergent function or bad seed."; }
+    @Override public String getMessage() { return "Root finder has timed out at " + getIteration() + ", with value " + getValue() + ". Most likely cause is divergent function or bad seed."; }
 }

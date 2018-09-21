@@ -1,3 +1,8 @@
+Version 1.1.19
+    - CLEANUP: Spelling mistake 'center' fixed
+    - CLEANUP: Further additions to documentation
+    - CLEANUP: toString() function removed when converting objects to strings
+
 Version 1.1.18
     - CLEANUP: First draft of specification complete.
     - CLEANIP: Documentation created.
@@ -24,8 +29,8 @@ Version 1.1.15
     - CLEANUP: Abstract modal class created, inherited by history and property dialogs
 
 Version 1.1.14
-    - FEATURE: Center on zero added
-    - BUG FIX: Center zoom no longer adds two entries per call to history
+    - FEATURE: Centre on zero added
+    - BUG FIX: Centre zoom no longer adds two entries per call to history
     - FEATURE: Newton-raphson root finder and relevant exceptions added
 
 Version 1.1.13

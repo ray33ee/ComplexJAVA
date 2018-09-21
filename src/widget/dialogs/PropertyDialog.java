@@ -64,7 +64,6 @@ public class PropertyDialog extends ModalDialog {
         txtMax = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setResizable(false);
 
         btnOk.setText("Ok");
         btnOk.setToolTipText("");

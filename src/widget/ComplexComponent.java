@@ -70,7 +70,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
             java.net.URL kernelpath = ComplexComponent.class.getResource("/kernel/kernel.cl");
             
             if (kernelpath == null || realpath == null || complexpath == null)
-                throw new RuntimeException("Exception at widget.ComplexComponent.prioritiseSpeed(), error \"" + new NullPointerException().toString() + "\". Could not find resource.");
+                throw new RuntimeException("Exception at widget.ComplexComponent.prioritiseSpeed(), error \"" + new NullPointerException() + "\". Could not find resource.");
             
             complexSource = IOUtils.readText(complexpath);
             realSource = IOUtils.readText(realpath);
@@ -78,7 +78,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
         }
         catch (IOException e)
         {
-            throw new RuntimeException("IOException at widget.ComplexComponent.prioritiseSpeed(), error \"" + e.toString() + "\". Problem with accessing kernel source code.");
+            throw new RuntimeException("IOException at widget.ComplexComponent.prioritiseSpeed(), error \"" + e + "\". Problem with accessing kernel source code.");
         }
     }
     
@@ -166,8 +166,8 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
             System.out.println("    " + _context.getDevices()[i].getName());
     }
     
-    /** Center the current landscape on 0+0i, whilst preserving scale. */
-    public void zeroCenter()
+    /** Centre the current landscape on 0+0i, whilst preserving scale. */
+    public void zeroCentre()
     {
         Complex min = _history.getCurrent().getMinDomain();
         Complex max = _history.getCurrent().getMaxDomain();
@@ -178,10 +178,10 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
     }
     
     /**
-     * Performs a zoom about the center of the landscape with the given factor
+     * Performs a zoom about the centre of the landscape with the given factor
      * @param factor the zoom scale factor
      */
-    public void centerZoom(double factor)
+    public void centreZoom(double factor)
     {
         Complex min = _history.getCurrent().getMinDomain();
         Complex max = _history.getCurrent().getMaxDomain();
@@ -283,7 +283,7 @@ public class ComplexComponent extends JComponent implements MouseMotionListener,
                 try
                 {
                     Complex root = _history.getCurrent().getEvaluator().newton_raphson(release);
-                    JOptionPane.showMessageDialog(this, "Root found at: " + root.toString() + " (" + root.toPolarString() + ")", "Input box error", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Root found at: " + root + " (" + root.toPolarString() + ")", "Input box error", JOptionPane.INFORMATION_MESSAGE);
                 }
                 catch (RootFinderException ex)
                 {

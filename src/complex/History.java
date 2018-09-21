@@ -90,9 +90,9 @@ public class History<T>
             return ans + " }";
         
         for (int i = 0; i < _pointer-1; ++i)
-            ans += _history.get(i).toString() + ", ";
+            ans += _history.get(i) + ", ";
         
-        ans += _history.get(_pointer-1).toString() + " }";
+        ans += _history.get(_pointer-1) + " }";
         
         return ans;
     }

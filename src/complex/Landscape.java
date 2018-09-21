@@ -42,5 +42,5 @@ public class Landscape
     
     public Complex getMaxDomain() { return _max; }
     
-    @Override public String toString() { return "f(z) = " + _evaltor.getEquation() + "    " + _min.toString() + "    " + _max.toString() + ""; }
+    @Override public String toString() { return "f(z) = " + _evaltor.getEquation() + "    " + _min + "    " + _max + ""; }
 }

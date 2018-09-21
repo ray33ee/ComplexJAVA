@@ -403,9 +403,9 @@ public class Evaluator {
             return ans + " }";
         
         for (int i = 0; i < _tokenlist.length-1; ++i)
-            ans += _tokenlist[i].toString() + ", ";
+            ans += _tokenlist[i] + ", ";
         
-        ans += _tokenlist[_tokenlist.length-1].toString() + " }";
+        ans += _tokenlist[_tokenlist.length-1] + " }";
         
         return ans;
     }
@@ -433,7 +433,7 @@ public class Evaluator {
 	Complex next = zn.subtract(f(zn).divide(fast_gradient(zn)));
         
         
-        System.out.println("Seed(" + (next.subtract(zn)).abs() + "): " + zn.toString());
+        System.out.println("Seed(" + (next.subtract(zn)).abs() + "): " + zn);
 
 	if ((next.subtract(zn)).abs() < 1E-317)
 		return next;

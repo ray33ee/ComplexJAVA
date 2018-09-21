@@ -105,7 +105,7 @@ public class MainFrame extends javax.swing.JFrame {
         btnCalculate = new javax.swing.JButton();
         btnZoomOut = new javax.swing.JButton();
         tglSpeed = new javax.swing.JToggleButton();
-        btnCenter = new javax.swing.JButton();
+        btnCentre = new javax.swing.JButton();
         btnHistory = new javax.swing.JButton();
         CanvasPane = new javax.swing.JPanel();
         StatusPane = new javax.swing.JPanel();
@@ -207,11 +207,11 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        btnCenter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/center.png"))); // NOI18N
-        btnCenter.setToolTipText("Center on zero");
-        btnCenter.addActionListener(new java.awt.event.ActionListener() {
+        btnCentre.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/toolbar/centre.png"))); // NOI18N
+        btnCentre.setToolTipText("Centre on zero");
+        btnCentre.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCenterActionPerformed(evt);
+                btnCentreActionPerformed(evt);
             }
         });
 
@@ -246,7 +246,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(2, 2, 2)
                 .addComponent(btnHistory, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnCenter, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnCentre, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnZoomIn, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -258,7 +258,7 @@ public class MainFrame extends javax.swing.JFrame {
         MenuPaneLayout.setVerticalGroup(
             MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(btnCenter, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnCentre, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MenuPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnNew, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -361,7 +361,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCalculateActionPerformed
 
     private void btnZoomInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZoomInActionPerformed
-        _canvas.centerZoom(-1.0/3.0);
+        _canvas.centreZoom(-1.0/3.0);
     }//GEN-LAST:event_btnZoomInActionPerformed
 
     private void btnRedoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRedoActionPerformed
@@ -397,12 +397,12 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnNewActionPerformed
 
     private void btnZoomOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZoomOutActionPerformed
-        _canvas.centerZoom(1.0);
+        _canvas.centreZoom(1.0);
     }//GEN-LAST:event_btnZoomOutActionPerformed
 
-    private void btnCenterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCenterActionPerformed
-        _canvas.zeroCenter();
-    }//GEN-LAST:event_btnCenterActionPerformed
+    private void btnCentreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCentreActionPerformed
+        _canvas.zeroCentre();
+    }//GEN-LAST:event_btnCentreActionPerformed
 
     private void btnHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistoryActionPerformed
         HistoryDialog history = new HistoryDialog(this, _canvas.getHistory());
@@ -425,7 +425,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel MenuPane;
     private javax.swing.JPanel StatusPane;
     private javax.swing.JButton btnCalculate;
-    private javax.swing.JButton btnCenter;
+    private javax.swing.JButton btnCentre;
     private javax.swing.JButton btnHistory;
     private javax.swing.JButton btnNew;
     private javax.swing.JButton btnNewton;
